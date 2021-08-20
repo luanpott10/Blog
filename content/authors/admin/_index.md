@@ -2,8 +2,11 @@
 bio: My research interests include digital agriculture, remote sensing, crop modeling and machine learning
 education:
   courses:
-  - course: PhD in Agricultural Engineering
+  - course: PhD student in Agricultural Engineering
     institution: Federal University of Santa Maria
+    year: 
+  - course: MBA Data Science and Artificial Intelligence
+    institution: Pontifical Catholic University PUC-RS
     year: 2021
   - course: Ms in Agricultural Engineering
     institution: Federal University of Santa Maria and Kansas State University

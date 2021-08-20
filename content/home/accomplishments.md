@@ -40,13 +40,6 @@ item:
   title: Big Data and The Environment
   url: ""
   
-- date_end: ""
-  date_start: "2021-01-01"
-  description: ""
-  organization: PUC RS
-  organization_url: https://www.pucrs.br/
-  title: Ciência de Dados e Inteligência Artificial
-  url: ""
 
 design:
   columns: '2' 
