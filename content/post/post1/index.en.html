@@ -1,0 +1,192 @@
+---
+title: "R - Cultivated crop maps in Rio Grande do Sul, Brazil"
+author: admin
+date: 2021-09-22
+image:
+  caption: 'Image credit: Pott L.P.'
+  focal_point: ""
+  placement: 1
+  preview_only: true
+subtitle: 'Welcome. In this post, I am going to show you how you may create maps of cultivated crops in Rio Grande do Sul state, Brazil.'
+summary: 'Welcome. In this post, I am going to show you how you may create maps of cultivated crops in Rio Grande do Sul state, Brazil.'
+  
+categories: ["R"]
+tags: ["R Markdown", "tidyverse", "maps"]
+---
+
+<script src="{{< blogdown/postref >}}index.en_files/header-attrs/header-attrs.js"></script>
+
+
+<div id="generate-crop-cultivated-maps" class="section level1">
+<h1>Generate crop cultivated maps</h1>
+<div id="crop-plantation-area-from-ibge" class="section level2">
+<h2>Crop plantation area from IBGE</h2>
+</div>
+<div id="loading-the-packages" class="section level2">
+<h2>Loading the packages</h2>
+<pre class="r"><code>library(readxl)
+library(tidyverse)
+library(geobr)
+library(patchwork)</code></pre>
+</div>
+<div id="url-link-of-data-from-ibge-on-github-httpsgithub.comluanpott10class" class="section level2">
+<h2>URL link of data from IBGE on GitHub <a href="https://github.com/luanpott10/Class" class="uri">https://github.com/luanpott10/Class</a></h2>
+</div>
+<div id="you-will-nedd-the-raw-file-httpsraw.githubusercontent.comluanpott10classmaintabela1612_1.csv" class="section level2">
+<h2>You will nedd the raw file <a href="https://raw.githubusercontent.com/luanpott10/Class/main/tabela1612_1.csv" class="uri">https://raw.githubusercontent.com/luanpott10/Class/main/tabela1612_1.csv</a></h2>
+</div>
+<div id="load-the-data-and-data-wrangling" class="section level2">
+<h2>Load the data and data wrangling</h2>
+<div id="the-data-downloaded-from-ibge-there-are-metadata-in-the-4-first-lines-that-are-not-intrest-for-us-skip-4." class="section level6">
+<h6>The data downloaded from IBGE there are metadata in the 4 first lines that are not intrest for us <code>skip = 4</code>.</h6>
+</div>
+<div id="also-there-are-info-in-the-last-rows-for-that-we-select-the-497-municipalities-data1497." class="section level6">
+<h6>Also, there are info in the last rows, for that we select the 497 municipalities <code>data[1:497,]</code>.</h6>
+</div>
+<div id="furthermore-the-rows-cities-without-crop-planted-ibge-used---or-instead-input-0-then-we-have-used-case_when-function." class="section level6">
+<h6>Furthermore, the rows (cities) without crop planted, IBGE used “-” or “…” instead input 0, then we have used <code>case_when</code> function.</h6>
+<pre class="r"><code>data &lt;- read_csv(&#39;https://raw.githubusercontent.com/luanpott10/Class/main/tabela1612_1.csv&#39;, skip = 4)
+data &lt;- data[1:497,]
+
+colnames(data) &lt;- c(&quot;code&quot;,&quot;city&quot;,&quot;rice&quot;,&quot;corn&quot;,&quot;soybean&quot;)
+
+data &lt;- data |&gt; 
+  mutate(rice_crop = case_when(rice == &quot;...&quot; | rice == &quot;-&quot; ~ 0,
+                                TRUE ~ as.double(rice))) |&gt; 
+  mutate(corn_crop = case_when(corn == &quot;...&quot; | corn == &quot;-&quot; ~ 0,
+                                TRUE ~ as.double(corn))) |&gt; 
+  mutate(soybean_crop = case_when(soybean == &quot;...&quot; | soybean == &quot;-&quot; ~ 0,
+                                TRUE ~ as.double(soybean)))
+  
+data &lt;- data |&gt; select(code,city,rice_crop,corn_crop,soybean_crop)</code></pre>
+</div>
+</div>
+<div id="dataset-of-geobr-package-from-municipalities-of-rio-grande-do-sul-state" class="section level2">
+<h2>Dataset of geobr package from municipalities of Rio Grande do Sul state</h2>
+<pre class="r"><code>cities_RS &lt;- read_municipality(code_muni = &quot;RS&quot;, year= 2020)</code></pre>
+</div>
+<div id="ggplot-of-the-cities" class="section level2">
+<h2>Ggplot of the cities</h2>
+<pre class="r"><code>ggplot()+
+  geom_sf(data=cities_RS)</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+</div>
+<div id="joining-the-ibge-data-and-the-sf-object" class="section level2">
+<h2>Joining the IBGE data and the sf object</h2>
+<pre class="r"><code>cities_RS$code_muni &lt;- as.character(cities_RS$code_muni)
+data_x &lt;- left_join(cities_RS,data,by= c(&quot;code_muni&quot;=&quot;code&quot;))</code></pre>
+</div>
+<div id="palettes" class="section level2">
+<h2>Palettes</h2>
+<pre class="r"><code>pal_soybean &lt;- c(&#39;#252525&#39;,&#39;#ccece6&#39;,&#39;#99d8c9&#39;,&#39;#66c2a4&#39;,&#39;#41ae76&#39;,&#39;#238b45&#39;,&#39;#006d2c&#39;,&#39;#00441b&#39;)
+pal_corn &lt;- c(&#39;#252525&#39;,&#39;#f7ffa8&#39;,&#39;#EFFD5F&#39;,&#39;#FCE205&#39;,&#39;#FCD12A&#39;,&#39;#FFC30B&#39;,&#39;#F9A602&#39;,&#39;#c48302&#39;)
+pal_rice &lt;- c(&#39;#252525&#39;,&#39;#caebfc&#39;,&#39;#9ecae1&#39;,&#39;#6baed6&#39;,&#39;#4292c6&#39;,&#39;#2171b5&#39;,&#39;#084594&#39;,&#39;#082954&#39;)</code></pre>
+</div>
+<div id="soybean-map" class="section level2">
+<h2>Soybean map</h2>
+<pre class="r"><code>(soybean_map &lt;-
+  ggplot()+
+    geom_sf(data=data_x,aes(fill=soybean_crop))+
+    theme_minimal()+
+    scale_fill_gradientn(colours=pal_soybean,
+                       limits = c(0,150000),
+                       na.value=&#39;#252525&#39;)+
+    labs(x= &quot;Longitude&quot;, y = &quot;Latitude&quot;, title = &quot;Soybean&quot;)+
+    guides(fill=guide_colorbar(title=&quot;Crop area (ha)&quot;,barwidth = 1,barheight = 4,
+                             frame.colour = &quot;black&quot;))+
+    theme(legend.position = c(0.17, 0.2),
+        panel.border = element_rect(color=&quot;Black&quot;, fill = NA),
+        panel.background = element_rect(fill = &quot;#f2f2f2&quot;),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.title.x = element_text(family = &quot;serif&quot;,
+                                    colour = &quot;#000000&quot;,size = 22.0),
+        axis.text.x = element_text(family = &quot;serif&quot;,
+                                   colour = &quot;#000000&quot;,size = 18.0),
+        axis.title.y = element_text(family = &quot;serif&quot;,
+                                    colour = &quot;#000000&quot;,size = 22.0),
+        axis.text.y = element_text(family = &quot;serif&quot;,
+                                   colour = &quot;#000000&quot;,size = 18.0),
+        legend.title = element_text(family = &quot;serif&quot;,
+                                    colour = &#39;#000000&#39;,size = 12.0),
+        legend.text = element_text(family = &quot;serif&quot;,
+                                   colour = &#39;#000000&#39;,size = 12.0),
+        legend.background = element_rect(fill=&quot;#f2f2f2&quot;,
+                                  linetype=&quot;dashed&quot;, 
+                                  colour =&quot;#f2f2f2&quot;)))</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-7-1.png" width="480" /></p>
+</div>
+<div id="corn-map" class="section level2">
+<h2>Corn map</h2>
+<pre class="r"><code>(corn_map &lt;-
+  ggplot()+
+    geom_sf(data=data_x,aes(fill=corn_crop))+
+    theme_minimal()+
+    scale_fill_gradientn(colours=pal_corn,
+                       limits = c(0,15000),
+                       na.value=&#39;#252525&#39;)+
+    labs(x= &quot;Longitude&quot;, y = &quot;Latitude&quot;, title = &quot;Corn&quot;)+
+    guides(fill=guide_colorbar(title=&quot;Crop area (ha)&quot;,barwidth = 1,barheight = 4,
+                             frame.colour = &quot;black&quot;))+
+    theme(legend.position = c(0.17, 0.2),
+        panel.border = element_rect(color=&quot;Black&quot;, fill = NA),
+        panel.background = element_rect(fill = &quot;#f2f2f2&quot;),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.title.x = element_text(family = &quot;serif&quot;,
+                                    colour = &quot;#000000&quot;,size = 22.0),
+        axis.text.x = element_text(family = &quot;serif&quot;,
+                                   colour = &quot;#000000&quot;,size = 18.0),
+        axis.title.y = element_text(family = &quot;serif&quot;,
+                                    colour = &quot;#000000&quot;,size = 22.0),
+        axis.text.y = element_text(family = &quot;serif&quot;,
+                                   colour = &quot;#000000&quot;,size = 18.0),
+        legend.title = element_text(family = &quot;serif&quot;,
+                                    colour = &#39;#000000&#39;,size = 12.0),
+        legend.text = element_text(family = &quot;serif&quot;,
+                                   colour = &#39;#000000&#39;,size = 12.0),
+        legend.background = element_rect(fill=&quot;#f2f2f2&quot;,
+                                  linetype=&quot;dashed&quot;, 
+                                  colour =&quot;#f2f2f2&quot;)))</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-8-1.png" width="480" /></p>
+</div>
+<div id="rice-map" class="section level2">
+<h2>Rice map</h2>
+<pre class="r"><code>(rice_map &lt;-
+  ggplot()+
+    geom_sf(data=data_x,aes(fill=rice_crop))+
+    theme_minimal()+
+    scale_fill_gradientn(colours=pal_rice,
+                       limits = c(0,75000),
+                       na.value=&#39;#252525&#39;)+
+    labs(x= &quot;Longitude&quot;, y = &quot;Latitude&quot;, title = &quot;Rice&quot;)+
+    guides(fill=guide_colorbar(title=&quot;Crop area (ha)&quot;,barwidth = 1,barheight = 4,
+                             frame.colour = &quot;black&quot;))+
+    theme(legend.position = c(0.17, 0.2),
+        panel.border = element_rect(color=&quot;Black&quot;, fill = NA),
+        panel.background = element_rect(fill = &quot;#f2f2f2&quot;),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.title.x = element_text(family = &quot;serif&quot;,
+                                    colour = &quot;#000000&quot;,size = 22.0),
+        axis.text.x = element_text(family = &quot;serif&quot;,
+                                   colour = &quot;#000000&quot;,size = 18.0),
+        axis.title.y = element_text(family = &quot;serif&quot;,
+                                    colour = &quot;#000000&quot;,size = 22.0),
+        axis.text.y = element_text(family = &quot;serif&quot;,
+                                   colour = &quot;#000000&quot;,size = 18.0),
+        legend.title = element_text(family = &quot;serif&quot;,
+                                    colour = &#39;#000000&#39;,size = 12.0),
+        legend.text = element_text(family = &quot;serif&quot;,
+                                   colour = &#39;#000000&#39;,size = 12.0),
+        legend.background = element_rect(fill=&quot;#f2f2f2&quot;,
+                                  linetype=&quot;dashed&quot;, 
+                                  colour =&quot;#f2f2f2&quot;)))</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-9-1.png" width="480" /></p>
+</div>
+<div id="crop-maps" class="section level2">
+<h2>Crop maps</h2>
+<pre class="r"><code>soybean_map + corn_map + rice_map</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-10-1.png" width="1440" /></p>
+</div>
+</div>
