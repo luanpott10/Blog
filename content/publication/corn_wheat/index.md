@@ -17,7 +17,7 @@ authors:
 - Rai Augusto Schwalbert
 - admin
 
-date: "2022-01-06T00:00:00Z"
+date: "2021-01-06T00:00:00Z"
 doi: "10.1590/1678-992X-2020-0327"
 projects: []
 publication: '*Scientia Agricola, 79*(5)'
