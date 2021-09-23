@@ -23,7 +23,6 @@ knitr::opts_chunk$set(collapse = TRUE)
 
 ## Loading the packages
 ```{r message=FALSE, warning=FALSE}
-library(readxl)
 library(tidyverse)
 library(geobr)
 library(patchwork)
