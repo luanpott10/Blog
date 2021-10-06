@@ -40,7 +40,22 @@ item:
   title: Big Data and The Environment
   url: ""
   
-
+- date_end: "2021-10-01"
+  date_start: "2021-10-05"
+  description: ""
+  organization: Udemy
+  organization_url: https://www.udemy.com/
+  title: Google Data Studio Complete Beginners to Advanced Tutorial
+  url: ""
+  
+- date_end: "2021-09-01"
+  date_start: "2021-09-30"
+  description: ""
+  organization: Udemy
+  organization_url: https://www.edx.org/
+  title: Data Science Tools
+  url: ""
+  
 design:
   columns: '2' 
 ---
