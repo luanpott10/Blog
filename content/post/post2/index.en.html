@@ -1,352 +1,539 @@
 ---
-title: "R - Data visualization, linear regression and logistic regression"
+title: "R - Data wrangling utilizing the most common functions from tidyverse package collection"
 author: admin
-date: 2021-09-23
+date: 2021-10-14
 image:
   caption: 'Image credit: Pott L.P.'
   focal_point: ""
   placement: 1
-  preview_only: true
-subtitle: 'Welcome. In this post, I am going to show you how you may create point maps, linear regression and logistic regression utilizing base R tools and tidymodels workflow'
-summary: 'Welcome. In this post, I am going to show you how you may create point maps, linear regression and logistic regression utilizing base R tools and tidymodels workflow'
+  preview_only: false
+subtitle: 'Welcome. In this post, I am going to show you how you may make data wrangling from a dataset utilizing the dplyr, plyr, and tidyr packages from tidyverse package collection.'
+summary: 'Welcome. In this post, I am going to show you how you may make data wrangling from a dataset utilizing the dplyr, plyr, and tidyr packages from tidyverse package collection.'
   
 categories: ["R"]
-tags: ["R Markdown", "tidyverse", "maps", "tidymodels"]
+tags: ["R Markdown", "data wrangling", "tidyverse"]
 ---
 
 <script src="{{< blogdown/postref >}}index.en_files/header-attrs/header-attrs.js"></script>
 
 
-<div id="data-visualization-linear-regression-and-logistic-regression" class="section level1">
-<h1>Data visualization, linear regression and logistic regression</h1>
-<div id="crop-data-collection---ground-truth-and-remote-sensing" class="section level2">
-<h2>Crop data collection - ground truth and remote sensing</h2>
+<div id="data-wrangling-utilizing-the-most-common-functions-from-tidyverse-package-collection." class="section level1">
+<h1>Data wrangling utilizing the most common functions from tidyverse package collection.</h1>
 </div>
-<div id="loading-the-packages" class="section level2">
-<h2>Loading the packages</h2>
-<pre class="r"><code>library(tidyverse)
-library(tidymodels)
-library(sf)
-library(geobr)</code></pre>
+<div id="loading-the-package" class="section level1">
+<h1>Loading the package</h1>
+<pre class="r"><code>library(tidyverse)</code></pre>
+<p>URL link of data from data collection and remote sensing on GitHub <a href="https://github.com/luanpott10/Class" class="uri">https://github.com/luanpott10/Class</a>
+You will need the raw file <a href="https://raw.githubusercontent.com/luanpott10/Class/main/data_crops.csv" class="uri">https://raw.githubusercontent.com/luanpott10/Class/main/data_crops.csv</a></p>
 </div>
-<div id="url-link-of-data-from-data-collcetion-and-remote-sensing-on-github-httpsgithub.comluanpott10class" class="section level2">
-<h2>URL link of data from data collcetion and remote sensing on GitHub <a href="https://github.com/luanpott10/Class" class="uri">https://github.com/luanpott10/Class</a></h2>
-</div>
-<div id="you-will-nedd-the-raw-file-httpsraw.githubusercontent.comluanpott10classmaindata_crops.csv" class="section level2">
-<h2>You will nedd the raw file <a href="https://raw.githubusercontent.com/luanpott10/Class/main/data_crops.csv" class="uri">https://raw.githubusercontent.com/luanpott10/Class/main/data_crops.csv</a></h2>
-</div>
-<div id="loading-the-data" class="section level2">
-<h2>Loading the data</h2>
+<div id="loading-the-data" class="section level1">
+<h1>Loading the data</h1>
 <pre class="r"><code>data &lt;- read.csv(&quot;https://raw.githubusercontent.com/luanpott10/Class/main/data_crops.csv&quot;)</code></pre>
 </div>
-<div id="plot-the-data-in-the-map" class="section level2">
-<h2>Plot the data in the map</h2>
-<pre class="r"><code>cities_RS &lt;- read_municipality(code_muni = &quot;RS&quot;, year= 2020)
-
-ggplot()+
-  geom_sf(data=cities_RS)+
-  geom_point(data=data,aes(x=longitude,y=latitude,fill=class),shape=22,size=2)+
-  labs(x= &quot;Longitude&quot;, y = &quot;Latitude&quot;)+
-  scale_fill_manual(values = c(&quot;#eded0c&quot;, &quot;#49a345&quot;))+
-  theme(legend.position = c(0.17, 0.2),
-        panel.border = element_rect(color=&quot;Black&quot;, fill = NA),
-        panel.background = element_rect(fill = &quot;#f2f2f2&quot;),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        axis.title.x = element_text(family = &quot;serif&quot;,
-                                    colour = &quot;#000000&quot;,size = 22.0),
-        axis.text.x = element_text(family = &quot;serif&quot;,
-                                   colour = &quot;#000000&quot;,size = 18.0),
-        axis.title.y = element_text(family = &quot;serif&quot;,
-                                    colour = &quot;#000000&quot;,size = 22.0),
-        axis.text.y = element_text(family = &quot;serif&quot;,
-                                   colour = &quot;#000000&quot;,size = 18.0),
-        legend.title = element_text(family = &quot;serif&quot;,
-                                    colour = &#39;#000000&#39;,size = 12.0),
-        legend.text = element_text(family = &quot;serif&quot;,
-                                   colour = &#39;#000000&#39;,size = 12.0),
-        legend.background = element_rect(fill=&quot;#f2f2f2&quot;,
-                                  linetype=&quot;dashed&quot;, 
-                                  colour =&quot;#f2f2f2&quot;))</code></pre>
-<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-3-1.png" width="480" /></p>
+<div id="a-rapid-view-of-the-data" class="section level1">
+<h1>A rapid view of the data</h1>
+<div id="functions-that-can-be-used" class="section level2">
+<h2>Functions that can be used</h2>
+<div id="glimpse" class="section level5">
+<h5><code>glimpse()</code></h5>
 </div>
-<div id="plot-the-data-variables---continuous-x-continuous" class="section level2">
-<h2>Plot the data variables - continuous x continuous</h2>
-<pre class="r"><code>ggplot(data=data,aes(x=b3_GCVI,y=b4_GCVI))+
-  geom_point(aes(fill=class),shape=22,size=2)+
-  scale_fill_manual(values = c(&quot;#eded0c&quot;, &quot;#49a345&quot;))+
-  
-  stat_smooth(formula = y~x, method=&quot;lm&quot;, se=FALSE,color=&quot;black&quot;, linetype=&#39;dashed&#39;)+
-
-  theme(panel.border = element_rect(color=&quot;Black&quot;, fill = NA),
-        panel.background = element_rect(fill = &quot;#f2f2f2&quot;),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        axis.title.x = element_text(family = &quot;serif&quot;,
-                                    colour = &quot;#000000&quot;,size = 22.0),
-        axis.text.x = element_text(family = &quot;serif&quot;,
-                                   colour = &quot;#000000&quot;,size = 18.0),
-        axis.title.y = element_text(family = &quot;serif&quot;,
-                                    colour = &quot;#000000&quot;,size = 22.0),
-        axis.text.y = element_text(family = &quot;serif&quot;,
-                                   colour = &quot;#000000&quot;,size = 18.0),
-        legend.title = element_text(family = &quot;serif&quot;,
-                                    colour = &#39;#000000&#39;,size = 12.0),
-        legend.text = element_text(family = &quot;serif&quot;,
-                                   colour = &#39;#000000&#39;,size = 12.0),
-        legend.background = element_rect(fill=&quot;#f2f2f2&quot;,
-                                  linetype=&quot;dashed&quot;, 
-                                  colour =&quot;#f2f2f2&quot;))</code></pre>
-<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<div id="head" class="section level5">
+<h5><code>head()</code></h5>
 </div>
-<div id="linear-regression" class="section level2">
-<h2>Linear regression</h2>
-<pre class="r"><code>lm_fit_x &lt;- lm(b3_GCVI ~ b4_GCVI, data = data)
-summary(lm_fit_x)
-## 
-## Call:
-## lm(formula = b3_GCVI ~ b4_GCVI, data = data)
-## 
-## Residuals:
-##     Min      1Q  Median      3Q     Max 
-## -3.7924 -0.9983 -0.0018  0.9525  3.9586 
-## 
-## Coefficients:
-##             Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept) -0.73701    0.15933  -4.626 1.14e-05 ***
-## b4_GCVI     -0.49793    0.04352 -11.440  &lt; 2e-16 ***
-## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
-## 
-## Residual standard error: 1.475 on 98 degrees of freedom
-## Multiple R-squared:  0.5718, Adjusted R-squared:  0.5675 
-## F-statistic: 130.9 on 1 and 98 DF,  p-value: &lt; 2.2e-16</code></pre>
+<div id="tail" class="section level5">
+<h5><code>tail()</code></h5>
 </div>
-<div id="linear-regression-by-tidymodels-workflow" class="section level2">
-<h2>Linear regression by tidymodels workflow</h2>
-<div id="creating-a-parsnip-specification-for-a-linear-regression-model" class="section level4">
-<h4>Creating a parsnip specification for a linear regression model</h4>
-<pre class="r"><code>lm_model &lt;- linear_reg() |&gt; 
-            set_engine(&#39;lm&#39;) |&gt; 
-            set_mode(&#39;regression&#39;)</code></pre>
+<div id="summary" class="section level5">
+<h5><code>summary()</code></h5>
+<pre class="r"><code>data |&gt; glimpse()
+## Rows: 100
+## Columns: 9
+## $ ï..n      &lt;int&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 1~
+## $ latitude  &lt;dbl&gt; -28.59329, -30.87459, -28.84481, -30.65571, -28.85978, -28.4~
+## $ longitude &lt;dbl&gt; -52.64978, -51.72551, -53.46126, -55.11848, -53.61491, -55.0~
+## $ class     &lt;chr&gt; &quot;soybean&quot;, &quot;soybean&quot;, &quot;soybean&quot;, &quot;soybean&quot;, &quot;soybean&quot;, &quot;soyb~
+## $ b0_GCVI   &lt;dbl&gt; -1.48824394, -1.07909429, 0.16900872, -0.92421901, -0.671991~
+## $ b1_GCVI   &lt;dbl&gt; -3.8113625, -1.8287302, -2.0509982, -2.5976772, -2.8033531, ~
+## $ b2_GCVI   &lt;dbl&gt; -6.3380713, -4.8378959, -2.7416265, -4.2464180, -4.3012776, ~
+## $ b3_GCVI   &lt;dbl&gt; 1.2918025, 2.0158091, -1.1819744, 0.8886908, -0.2094595, 2.6~
+## $ b4_GCVI   &lt;dbl&gt; -4.631691, -2.661626, -2.707749, -3.352147, -3.434427, -7.33~
+data |&gt; head(5)
+##   ï..n  latitude longitude   class    b0_GCVI   b1_GCVI   b2_GCVI    b3_GCVI
+## 1    1 -28.59329 -52.64978 soybean -1.4882439 -3.811363 -6.338071  1.2918025
+## 2    2 -30.87459 -51.72551 soybean -1.0790943 -1.828730 -4.837896  2.0158091
+## 3    3 -28.84481 -53.46126 soybean  0.1690087 -2.050998 -2.741627 -1.1819744
+## 4    4 -30.65571 -55.11848 soybean -0.9242190 -2.597677 -4.246418  0.8886908
+## 5    5 -28.85978 -53.61491 soybean -0.6719911 -2.803353 -4.301278 -0.2094595
+##     b4_GCVI
+## 1 -4.631691
+## 2 -2.661626
+## 3 -2.707749
+## 4 -3.352147
+## 5 -3.434427
+data |&gt; tail(5)
+##     ï..n  latitude longitude class  b0_GCVI    b1_GCVI  b2_GCVI   b3_GCVI
+## 96    96 -28.53374 -52.84692  corn 5.628807  1.4232943 5.189684 -3.280593
+## 97    97 -27.67757 -54.75618  corn 7.803896  5.7830925 7.469813 -1.889733
+## 98    98 -28.32241 -51.33973  corn 3.854038 -0.4112832 2.829001 -2.718110
+## 99    99 -28.13302 -51.36585  corn 2.423372 -1.6455027 1.057501 -2.884991
+## 100  100 -28.05637 -54.54361  corn 7.691086  4.8666124 7.726856 -2.407301
+##       b4_GCVI
+## 96   2.666456
+## 97   5.124163
+## 98   0.711688
+## 99  -1.349620
+## 100  4.228607
+data |&gt; summary()
+##       ï..n           latitude        longitude         class          
+##  Min.   :  1.00   Min.   :-33.67   Min.   :-55.86   Length:100        
+##  1st Qu.: 25.75   1st Qu.:-28.90   1st Qu.:-53.62   Class :character  
+##  Median : 50.50   Median :-28.47   Median :-52.83   Mode  :character  
+##  Mean   : 50.50   Mean   :-28.83   Mean   :-53.03                     
+##  3rd Qu.: 75.25   3rd Qu.:-27.96   3rd Qu.:-52.18                     
+##  Max.   :100.00   Max.   :-27.22   Max.   :-50.48                     
+##     b0_GCVI           b1_GCVI           b2_GCVI           b3_GCVI        
+##  Min.   :-10.400   Min.   :-7.3446   Min.   :-19.354   Min.   :-6.16632  
+##  1st Qu.: -1.373   1st Qu.:-3.0439   1st Qu.: -5.601   1st Qu.:-1.93480  
+##  Median :  0.650   Median :-1.7779   Median : -2.768   Median :-0.07191  
+##  Mean   :  1.181   Mean   :-0.9485   Mean   : -1.731   Mean   :-0.04668  
+##  3rd Qu.:  4.529   3rd Qu.: 1.1793   3rd Qu.:  3.622   3rd Qu.: 1.53019  
+##  Max.   : 13.737   Max.   : 6.5656   Max.   : 17.014   Max.   : 6.54275  
+##     b4_GCVI      
+##  Min.   :-7.332  
+##  1st Qu.:-4.117  
+##  Median :-2.728  
+##  Mean   :-1.386  
+##  3rd Qu.: 2.069  
+##  Max.   : 5.124</code></pre>
 </div>
-<div id="fitting-the-model-supplying-a-formula-expression-and-the-data" class="section level4">
-<h4>Fitting the model supplying a formula expression and the data</h4>
-<pre class="r"><code>lm_fit &lt;- lm_model %&gt;% 
-          fit(b3_GCVI ~ b4_GCVI, data = data)</code></pre>
 </div>
-<div id="summary-of-the-model" class="section level4">
-<h4>Summary of the model</h4>
-<pre class="r"><code>lm_fit |&gt; 
-  pluck(&quot;fit&quot;) |&gt; 
-  summary()
-## 
-## Call:
-## stats::lm(formula = b3_GCVI ~ b4_GCVI, data = data)
-## 
-## Residuals:
-##     Min      1Q  Median      3Q     Max 
-## -3.7924 -0.9983 -0.0018  0.9525  3.9586 
-## 
-## Coefficients:
-##             Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept) -0.73701    0.15933  -4.626 1.14e-05 ***
-## b4_GCVI     -0.49793    0.04352 -11.440  &lt; 2e-16 ***
-## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
-## 
-## Residual standard error: 1.475 on 98 degrees of freedom
-## Multiple R-squared:  0.5718, Adjusted R-squared:  0.5675 
-## F-statistic: 130.9 on 1 and 98 DF,  p-value: &lt; 2.2e-16
-# Also you can use
-lm_fit$fit |&gt; summary()
-## 
-## Call:
-## stats::lm(formula = b3_GCVI ~ b4_GCVI, data = data)
-## 
-## Residuals:
-##     Min      1Q  Median      3Q     Max 
-## -3.7924 -0.9983 -0.0018  0.9525  3.9586 
-## 
-## Coefficients:
-##             Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept) -0.73701    0.15933  -4.626 1.14e-05 ***
-## b4_GCVI     -0.49793    0.04352 -11.440  &lt; 2e-16 ***
-## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
-## 
-## Residual standard error: 1.475 on 98 degrees of freedom
-## Multiple R-squared:  0.5718, Adjusted R-squared:  0.5675 
-## F-statistic: 130.9 on 1 and 98 DF,  p-value: &lt; 2.2e-16</code></pre>
 </div>
-<div id="parameter-estimates-of-a-the-lm-object" class="section level4">
-<h4>Parameter estimates of a the lm object</h4>
-<pre class="r"><code>tidy(lm_fit)
+<div id="select" class="section level1">
+<h1>Select</h1>
+<div id="select-function-is-used-for-selecting-columns-in-a-data-frame." class="section level2">
+<h2><code>select</code> function is used for selecting columns in a data frame.</h2>
+</div>
+<div id="here-i-brought-you-some-examples-of-the-select-function-for-selecting-different-columns-in-different-ways." class="section level2">
+<h2>Here I brought you some examples of the <code>select</code> function for selecting different columns in different ways.</h2>
+<pre class="r"><code>data |&gt; select(1) |&gt; head(6)
+##   ï..n
+## 1    1
+## 2    2
+## 3    3
+## 4    4
+## 5    5
+## 6    6
+data |&gt; select(last_col()) |&gt; head(6)
+##     b4_GCVI
+## 1 -4.631691
+## 2 -2.661626
+## 3 -2.707749
+## 4 -3.352147
+## 5 -3.434427
+## 6 -7.331731
+data |&gt; select(c(class,b0_GCVI,b1_GCVI,b2_GCVI,b3_GCVI,b4_GCVI)) |&gt; head(6)
+##     class    b0_GCVI   b1_GCVI    b2_GCVI    b3_GCVI   b4_GCVI
+## 1 soybean -1.4882439 -3.811363  -6.338071  1.2918025 -4.631691
+## 2 soybean -1.0790943 -1.828730  -4.837896  2.0158091 -2.661626
+## 3 soybean  0.1690087 -2.050998  -2.741627 -1.1819744 -2.707749
+## 4 soybean -0.9242190 -2.597677  -4.246418  0.8886908 -3.352147
+## 5 soybean -0.6719911 -2.803353  -4.301278 -0.2094595 -3.434427
+## 6 soybean -5.1542411 -7.344623 -10.879841  2.6003060 -7.331731
+data |&gt; select(-c(ï..n,latitude,longitude)) |&gt; head(6)
+##     class    b0_GCVI   b1_GCVI    b2_GCVI    b3_GCVI   b4_GCVI
+## 1 soybean -1.4882439 -3.811363  -6.338071  1.2918025 -4.631691
+## 2 soybean -1.0790943 -1.828730  -4.837896  2.0158091 -2.661626
+## 3 soybean  0.1690087 -2.050998  -2.741627 -1.1819744 -2.707749
+## 4 soybean -0.9242190 -2.597677  -4.246418  0.8886908 -3.352147
+## 5 soybean -0.6719911 -2.803353  -4.301278 -0.2094595 -3.434427
+## 6 soybean -5.1542411 -7.344623 -10.879841  2.6003060 -7.331731
+data |&gt; select(starts_with(&quot;b&quot;)) |&gt; head(6)
+##      b0_GCVI   b1_GCVI    b2_GCVI    b3_GCVI   b4_GCVI
+## 1 -1.4882439 -3.811363  -6.338071  1.2918025 -4.631691
+## 2 -1.0790943 -1.828730  -4.837896  2.0158091 -2.661626
+## 3  0.1690087 -2.050998  -2.741627 -1.1819744 -2.707749
+## 4 -0.9242190 -2.597677  -4.246418  0.8886908 -3.352147
+## 5 -0.6719911 -2.803353  -4.301278 -0.2094595 -3.434427
+## 6 -5.1542411 -7.344623 -10.879841  2.6003060 -7.331731
+data |&gt; select(ends_with(&quot;GCVI&quot;)) |&gt; head(6)
+##      b0_GCVI   b1_GCVI    b2_GCVI    b3_GCVI   b4_GCVI
+## 1 -1.4882439 -3.811363  -6.338071  1.2918025 -4.631691
+## 2 -1.0790943 -1.828730  -4.837896  2.0158091 -2.661626
+## 3  0.1690087 -2.050998  -2.741627 -1.1819744 -2.707749
+## 4 -0.9242190 -2.597677  -4.246418  0.8886908 -3.352147
+## 5 -0.6719911 -2.803353  -4.301278 -0.2094595 -3.434427
+## 6 -5.1542411 -7.344623 -10.879841  2.6003060 -7.331731
+data |&gt; select(where(is.numeric)) |&gt; head(6)
+##   ï..n  latitude longitude    b0_GCVI   b1_GCVI    b2_GCVI    b3_GCVI   b4_GCVI
+## 1    1 -28.59329 -52.64978 -1.4882439 -3.811363  -6.338071  1.2918025 -4.631691
+## 2    2 -30.87459 -51.72551 -1.0790943 -1.828730  -4.837896  2.0158091 -2.661626
+## 3    3 -28.84481 -53.46126  0.1690087 -2.050998  -2.741627 -1.1819744 -2.707749
+## 4    4 -30.65571 -55.11848 -0.9242190 -2.597677  -4.246418  0.8886908 -3.352147
+## 5    5 -28.85978 -53.61491 -0.6719911 -2.803353  -4.301278 -0.2094595 -3.434427
+## 6    6 -28.41732 -55.03171 -5.1542411 -7.344623 -10.879841  2.6003060 -7.331731</code></pre>
+</div>
+</div>
+<div id="arrange" class="section level1">
+<h1>Arrange</h1>
+<div id="arrange-function-is-used-for-orders-the-rows-of-a-data-frame-by-the-values-of-selected-columns." class="section level2">
+<h2><code>arrange</code> function is used for orders the rows of a data frame by the values of selected columns.</h2>
+</div>
+<div id="in-some-cases-we-would-like-to-see-the-ordered-rows-according-a-determined-column-for-that-we-use-arrange-function." class="section level2">
+<h2>In some cases we would like to see the ordered rows according a determined column, for that we use <code>arrange</code> function.</h2>
+<pre class="r"><code>data |&gt; arrange(b4_GCVI) |&gt; head(6)
+##   ï..n  latitude longitude   class    b0_GCVI   b1_GCVI    b2_GCVI  b3_GCVI
+## 1    6 -28.41732 -55.03171 soybean  -5.154241 -7.344623 -10.879841 2.600306
+## 2   44 -27.94593 -52.35423 soybean  -6.849492 -6.901615 -13.810637 4.647782
+## 3   11 -29.02970 -54.92061 soybean -10.400090 -6.194132 -19.353834 6.542745
+## 4   31 -28.20905 -51.63171 soybean  -3.497307 -5.756842  -9.003927 1.384130
+## 5   18 -27.71189 -52.56109 soybean  -4.217597 -5.241977 -10.647408 3.294080
+## 6   14 -32.11317 -53.16475 soybean  -4.723501 -4.550052 -11.359418 2.981974
+##     b4_GCVI
+## 1 -7.331731
+## 2 -7.022087
+## 3 -6.669860
+## 4 -6.664257
+## 5 -5.579582
+## 6 -5.544666</code></pre>
+</div>
+</div>
+<div id="relocate" class="section level1">
+<h1>Relocate</h1>
+<div id="relocate-function-change-column-positions." class="section level2">
+<h2><code>relocate</code> function change column positions.</h2>
+</div>
+<div id="generally-in-a-machine-learning-model-we-have-the-last-column-as-the-label-for-do-that-we-can-use-the-relocate-function." class="section level2">
+<h2>Generally in a machine learning model we have the last column as the label, for do that we can use the <code>relocate</code> function.</h2>
+<pre class="r"><code>data |&gt; relocate(-class) |&gt; head(6)
+##   ï..n  latitude longitude    b0_GCVI   b1_GCVI    b2_GCVI    b3_GCVI   b4_GCVI
+## 1    1 -28.59329 -52.64978 -1.4882439 -3.811363  -6.338071  1.2918025 -4.631691
+## 2    2 -30.87459 -51.72551 -1.0790943 -1.828730  -4.837896  2.0158091 -2.661626
+## 3    3 -28.84481 -53.46126  0.1690087 -2.050998  -2.741627 -1.1819744 -2.707749
+## 4    4 -30.65571 -55.11848 -0.9242190 -2.597677  -4.246418  0.8886908 -3.352147
+## 5    5 -28.85978 -53.61491 -0.6719911 -2.803353  -4.301278 -0.2094595 -3.434427
+## 6    6 -28.41732 -55.03171 -5.1542411 -7.344623 -10.879841  2.6003060 -7.331731
+##     class
+## 1 soybean
+## 2 soybean
+## 3 soybean
+## 4 soybean
+## 5 soybean
+## 6 soybean</code></pre>
+</div>
+</div>
+<div id="filter" class="section level1">
+<h1>Filter</h1>
+<div id="filter-function-is-used-to-subset-a-data-frame-retaining-all-rows-that-satisfy-your-conditions." class="section level2">
+<h2><code>filter</code> function is used to subset a data frame, retaining all rows that satisfy your conditions.</h2>
+</div>
+<div id="the-most-common-operators-that-are-useful-to-build-the-conditions-are" class="section level2">
+<h2>The most common operators that are useful to build the conditions are:</h2>
+<div id="section" class="section level5">
+<h5><code>==</code>, <code>&gt;</code>, <code>&gt;=</code></h5>
+</div>
+<div id="xor" class="section level5">
+<h5><code>&amp;</code>, <code>|</code>, <code>!</code>, <code>xor()</code></h5>
+</div>
+<div id="is.na" class="section level5">
+<h5><code>is.na()</code></h5>
+</div>
+<div id="between-near" class="section level5">
+<h5><code>between()</code>, <code>near()</code></h5>
+</div>
+</div>
+<div id="we-also-may-put-more-than-one-filter-in-the-same-filter-function." class="section level2">
+<h2>We also may put more than one filter in the same <code>filter</code> function.</h2>
+<pre class="r"><code>data |&gt; filter(class == &quot;soybean&quot;, b4_GCVI &gt; -4) |&gt; head(6)
+##   ï..n  latitude longitude   class    b0_GCVI   b1_GCVI   b2_GCVI    b3_GCVI
+## 1    2 -30.87459 -51.72551 soybean -1.0790943 -1.828730 -4.837896  2.0158091
+## 2    3 -28.84481 -53.46126 soybean  0.1690087 -2.050998 -2.741627 -1.1819744
+## 3    4 -30.65571 -55.11848 soybean -0.9242190 -2.597677 -4.246418  0.8886908
+## 4    5 -28.85978 -53.61491 soybean -0.6719911 -2.803353 -4.301278 -0.2094595
+## 5    9 -30.80493 -55.27339 soybean -0.9067734 -3.203305 -4.744385  0.5329000
+## 6   13 -31.31976 -53.99590 soybean -2.4681277 -2.352393 -7.690125  3.9750807
+##     b4_GCVI
+## 1 -2.661626
+## 2 -2.707749
+## 3 -3.352147
+## 4 -3.434427
+## 5 -3.771788
+## 6 -1.823997</code></pre>
+</div>
+</div>
+<div id="rename" class="section level1">
+<h1>Rename</h1>
+<div id="rename-changes-the-names-of-individual-variables." class="section level2">
+<h2><code>rename</code> changes the names of individual variables.</h2>
+</div>
+<div id="column-names-in-datasets-should-be-short-inuitive-and-complete.-for-that-many-times-we-need-to-rename-columns-for-the-dataset." class="section level2">
+<h2>Column names in datasets should be short, inuitive and complete. For that many times we need to rename columns for the dataset.</h2>
+<pre class="r"><code>data |&gt; rename(n = ï..n) |&gt; head(6)
+##   n  latitude longitude   class    b0_GCVI   b1_GCVI    b2_GCVI    b3_GCVI
+## 1 1 -28.59329 -52.64978 soybean -1.4882439 -3.811363  -6.338071  1.2918025
+## 2 2 -30.87459 -51.72551 soybean -1.0790943 -1.828730  -4.837896  2.0158091
+## 3 3 -28.84481 -53.46126 soybean  0.1690087 -2.050998  -2.741627 -1.1819744
+## 4 4 -30.65571 -55.11848 soybean -0.9242190 -2.597677  -4.246418  0.8886908
+## 5 5 -28.85978 -53.61491 soybean -0.6719911 -2.803353  -4.301278 -0.2094595
+## 6 6 -28.41732 -55.03171 soybean -5.1542411 -7.344623 -10.879841  2.6003060
+##     b4_GCVI
+## 1 -4.631691
+## 2 -2.661626
+## 3 -2.707749
+## 4 -3.352147
+## 5 -3.434427
+## 6 -7.331731</code></pre>
+</div>
+</div>
+<div id="summarise" class="section level1">
+<h1>Summarise</h1>
+<div id="summarise-creates-a-new-data-frame." class="section level2">
+<h2><code>summarise</code> creates a new data frame.</h2>
+</div>
+<div id="the-objective-of-the-function-is-summarise-a-data-frame-for-an-aspect." class="section level2">
+<h2>The objective of the function is summarise a data frame for an aspect.</h2>
+</div>
+<div id="the-most-common-functions-used-into-summarise-function-are" class="section level2">
+<h2>The most common functions used into <code>summarise</code> function are:</h2>
+<div id="mean-median" class="section level5">
+<h5><code>mean()</code>, <code>median()</code></h5>
+</div>
+<div id="sd-iqr-mad" class="section level5">
+<h5><code>sd()</code>, <code>IQR()</code>, <code>mad()</code></h5>
+</div>
+<div id="min-max-quantile" class="section level5">
+<h5><code>min()</code>, <code>max()</code>, <code>quantile()</code></h5>
+</div>
+<div id="first-last-nth" class="section level5">
+<h5><code>first()</code>, <code>last()</code>, <code>nth()</code></h5>
+</div>
+<div id="n-n_distinct" class="section level5">
+<h5><code>n()</code>, <code>n_distinct()</code></h5>
+</div>
+<div id="any-all" class="section level5">
+<h5><code>any()</code>, <code>all()</code></h5>
+</div>
+</div>
+<div id="we-also-may-put-more-than-one-function-in-summarise-function." class="section level2">
+<h2>We also may put more than one function in <code>summarise</code> function.</h2>
+<pre class="r"><code>data |&gt; summarise(n = n(), min = min(b4_GCVI), max = max(b4_GCVI), mean = mean(b4_GCVI))
+##     n       min      max      mean
+## 1 100 -7.331731 5.124163 -1.386388</code></pre>
+</div>
+</div>
+<div id="group-by" class="section level1">
+<h1>Group by</h1>
+<div id="group_by-takes-an-existing-data-frame-and-converts-it-into-a-grouped-data-frame-where-operations-are-performed-by-group.-ungroup-removes-grouping." class="section level2">
+<h2><code>group_by</code> takes an existing data frame and converts it into a grouped data frame where operations are performed by group. ungroup() removes grouping.</h2>
+</div>
+<div id="generally-the-group_by-function-is-used-before-the-summarise-function-to-generate-summaries-by-group." class="section level2">
+<h2>Generally the <code>group_by</code> function is used before the <code>summarise</code> function to generate summaries by group.</h2>
+<pre class="r"><code>data |&gt; group_by(class) |&gt; summarise(n = n(), min = min(b4_GCVI), max = max(b4_GCVI), mean = mean(b4_GCVI))
 ## # A tibble: 2 x 5
-##   term        estimate std.error statistic  p.value
-##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
-## 1 (Intercept)   -0.737    0.159      -4.63 1.14e- 5
-## 2 b4_GCVI       -0.498    0.0435    -11.4  9.39e-20</code></pre>
-</div>
-<div id="extract-the-model-statistics" class="section level4">
-<h4>Extract the model statistics</h4>
-<pre class="r"><code>glance(lm_fit)
-## # A tibble: 1 x 12
-##   r.squared adj.r.squared sigma statistic  p.value    df logLik   AIC   BIC
-##       &lt;dbl&gt;         &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
-## 1     0.572         0.567  1.47      131. 9.39e-20     1  -180.  365.  373.
-## # ... with 3 more variables: deviance &lt;dbl&gt;, df.residual &lt;int&gt;, nobs &lt;int&gt;</code></pre>
+##   class       n   min   max  mean
+##   &lt;chr&gt;   &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+## 1 corn       50 -3.33  5.12  1.34
+## 2 soybean    50 -7.33 -1.29 -4.11</code></pre>
 </div>
 </div>
-<div id="plot-the-data-variables---categorical-x-continuous" class="section level2">
-<h2>Plot the data variables - categorical x continuous</h2>
-<pre class="r"><code>data &lt;- data |&gt; mutate(target = case_when(class == &quot;corn&quot; ~ 0,
-                                          class == &quot;soybean&quot; ~ 1))
+<div id="pull" class="section level1">
+<h1>Pull</h1>
+<div id="pull-selects-a-column-in-a-data-frame-and-transforms-it-into-a-vector." class="section level2">
+<h2><code>pull</code> selects a column in a data frame and transforms it into a vector.</h2>
+</div>
+<div id="when-we-are-leading-with-data-wrangling-we-can-use-pull-function-to-extract-columns-as-a-vector." class="section level2">
+<h2>When we are leading with data wrangling we can use <code>pull</code> function to extract columns as a vector.</h2>
+<pre class="r"><code>data |&gt; pull(b4_GCVI) |&gt; head(6)
+## [1] -4.631691 -2.661626 -2.707749 -3.352147 -3.434427 -7.331731</code></pre>
+</div>
+</div>
+<div id="across" class="section level1">
+<h1>Across</h1>
+<div id="across-makes-it-easy-to-apply-the-same-transformation-to-multiple-columns." class="section level2">
+<h2><code>across</code> makes it easy to apply the same transformation to multiple columns.</h2>
+</div>
+<div id="generally-it-is-used-into-summarise-and-mutate-functions." class="section level2">
+<h2>Generally it is used into <code>summarise()</code> and <code>mutate()</code> functions.</h2>
+</div>
+<div id="in-this-example-we-are-rounding-to-2-decimals-the-double-variables-except-latitude-and-longitude." class="section level2">
+<h2>In this example we are rounding to 2 decimals the double variables except latitude and longitude.</h2>
+<pre class="r"><code>data |&gt; 
+  mutate(across(where(is.double) &amp; !c(latitude, longitude), ~ round(.x,2))) |&gt; head(6)
+##   ï..n  latitude longitude   class b0_GCVI b1_GCVI b2_GCVI b3_GCVI b4_GCVI
+## 1    1 -28.59329 -52.64978 soybean   -1.49   -3.81   -6.34    1.29   -4.63
+## 2    2 -30.87459 -51.72551 soybean   -1.08   -1.83   -4.84    2.02   -2.66
+## 3    3 -28.84481 -53.46126 soybean    0.17   -2.05   -2.74   -1.18   -2.71
+## 4    4 -30.65571 -55.11848 soybean   -0.92   -2.60   -4.25    0.89   -3.35
+## 5    5 -28.85978 -53.61491 soybean   -0.67   -2.80   -4.30   -0.21   -3.43
+## 6    6 -28.41732 -55.03171 soybean   -5.15   -7.34  -10.88    2.60   -7.33</code></pre>
+</div>
+</div>
+<div id="join" class="section level1">
+<h1>Join</h1>
+<div id="join-function-joins-two-data-frames-together." class="section level2">
+<h2><code>join</code> function joins two data frames together.</h2>
+</div>
+<div id="joining-tables-data-frames-with-foreign-key-the-by-in-the-join-function-is-the-most-important-for-relational-databases." class="section level2">
+<h2>Joining tables, data frames with foreign key, the <code>by</code> in the <code>join</code> function is the most important for relational databases.</h2>
+</div>
+<div id="the-types-of-join-are" class="section level2">
+<h2>The types of join are:</h2>
+<div id="inner_join-only-rows-with-matching-keys-in-both-x-and-y" class="section level3">
+<h3><code>inner_join</code> : only rows with matching keys in both x and y;</h3>
+</div>
+<div id="left_join-all-rows-in-x-adding-matching-columns-from-y" class="section level3">
+<h3><code>left_join</code> : all rows in x, adding matching columns from y;</h3>
+</div>
+<div id="right_join-all-rows-in-y-adding-matching-columns-from-x" class="section level3">
+<h3><code>right_join</code> : all rows in y, adding matching columns from x;</h3>
+</div>
+<div id="full_join-all-rows-in-x-with-matching-columns-in-y-then-the-rows-of-y-that-dont-match-x." class="section level3">
+<h3><code>full_join</code> : all rows in x with matching columns in y, then the rows of y that don’t match x.</h3>
+</div>
+</div>
+<div id="you-can-se-the-differences-with-the-below-example." class="section level2">
+<h2>You can se the differences with the below example.</h2>
+<pre class="r"><code>data |&gt; select(ï..n,latitude,longitude,class,b0_GCVI) -&gt; data_1
+data |&gt; select(ï..n,latitude,longitude,class,b1_GCVI) -&gt; data_2
 
-ggplot(data=data, aes(y=target,x=b4_GCVI))+
-  geom_point(aes(fill=as.factor(target)),shape=22,size=2) +
-  scale_fill_manual(values = c(&quot;#eded0c&quot;, &quot;#49a345&quot;))+
-  scale_y_continuous(breaks=c(0,1),
-                   labels=c(&quot;0&quot;,&quot;1&quot;),
-                   limits=c(0,1))+
+data_1 &lt;- data_1[1:60,]
+data_2 &lt;- data_2[51:100,]
 
-  stat_smooth(formula = y~x, method=&quot;glm&quot;, se=FALSE, method.args = list(family=binomial),
-              color=&quot;black&quot;, linetype=&#39;dashed&#39;)+
-  labs(x= &quot;b4_GCVI&quot;, y = &quot;Class&quot;,fill=&quot;Class&quot;)+
-
-  theme(legend.position = c(0.17, 0.2),
-        panel.border = element_rect(color=&quot;Black&quot;, fill = NA),
-        panel.background = element_rect(fill = &quot;#f2f2f2&quot;),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        axis.title.x = element_text(family = &quot;serif&quot;,
-                                    colour = &quot;#000000&quot;,size = 22.0),
-        axis.text.x = element_text(family = &quot;serif&quot;,
-                                   colour = &quot;#000000&quot;,size = 18.0),
-        axis.title.y = element_text(family = &quot;serif&quot;,
-                                    colour = &quot;#000000&quot;,size = 22.0),
-        axis.text.y = element_text(family = &quot;serif&quot;,
-                                   colour = &quot;#000000&quot;,size = 18.0),
-        legend.title = element_text(family = &quot;serif&quot;,
-                                    colour = &#39;#000000&#39;,size = 12.0),
-        legend.text = element_text(family = &quot;serif&quot;,
-                                   colour = &#39;#000000&#39;,size = 12.0),
-        legend.background = element_rect(fill=&quot;#f2f2f2&quot;,
-                                  linetype=&quot;dashed&quot;, 
-                                  colour =&quot;#f2f2f2&quot;))</code></pre>
-<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-11-1.png" width="480" /></p>
+data_x &lt;- inner_join(data_1,data_2, by = c(&quot;ï..n&quot;,&quot;latitude&quot;,&quot;longitude&quot;,&quot;class&quot;))
+data_x |&gt; glimpse()
+## Rows: 10
+## Columns: 6
+## $ ï..n      &lt;int&gt; 51, 52, 53, 54, 55, 56, 57, 58, 59, 60
+## $ latitude  &lt;dbl&gt; -27.93454, -28.12877, -27.89983, -28.43043, -28.58020, -27.7~
+## $ longitude &lt;dbl&gt; -52.08487, -51.32797, -54.50413, -51.63524, -51.75654, -51.7~
+## $ class     &lt;chr&gt; &quot;corn&quot;, &quot;corn&quot;, &quot;corn&quot;, &quot;corn&quot;, &quot;corn&quot;, &quot;corn&quot;, &quot;corn&quot;, &quot;cor~
+## $ b0_GCVI   &lt;dbl&gt; 4.5186558, 1.2942828, 7.8575535, -2.8303745, -0.2717497, 5.2~
+## $ b1_GCVI   &lt;dbl&gt; 0.8883052, -2.2323170, 5.9253740, -5.7838035, -3.2403061, 1.~
+data_x &lt;- left_join(data_1,data_2, by = c(&quot;ï..n&quot;,&quot;latitude&quot;,&quot;longitude&quot;,&quot;class&quot;))
+data_x |&gt; glimpse()
+## Rows: 60
+## Columns: 6
+## $ ï..n      &lt;int&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 1~
+## $ latitude  &lt;dbl&gt; -28.59329, -30.87459, -28.84481, -30.65571, -28.85978, -28.4~
+## $ longitude &lt;dbl&gt; -52.64978, -51.72551, -53.46126, -55.11848, -53.61491, -55.0~
+## $ class     &lt;chr&gt; &quot;soybean&quot;, &quot;soybean&quot;, &quot;soybean&quot;, &quot;soybean&quot;, &quot;soybean&quot;, &quot;soyb~
+## $ b0_GCVI   &lt;dbl&gt; -1.48824394, -1.07909429, 0.16900872, -0.92421901, -0.671991~
+## $ b1_GCVI   &lt;dbl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, ~
+data_x &lt;- right_join(data_1,data_2, by = c(&quot;ï..n&quot;,&quot;latitude&quot;,&quot;longitude&quot;,&quot;class&quot;))
+data_x |&gt; glimpse()
+## Rows: 50
+## Columns: 6
+## $ ï..n      &lt;int&gt; 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, ~
+## $ latitude  &lt;dbl&gt; -27.93454, -28.12877, -27.89983, -28.43043, -28.58020, -27.7~
+## $ longitude &lt;dbl&gt; -52.08487, -51.32797, -54.50413, -51.63524, -51.75654, -51.7~
+## $ class     &lt;chr&gt; &quot;corn&quot;, &quot;corn&quot;, &quot;corn&quot;, &quot;corn&quot;, &quot;corn&quot;, &quot;corn&quot;, &quot;corn&quot;, &quot;cor~
+## $ b0_GCVI   &lt;dbl&gt; 4.5186558, 1.2942828, 7.8575535, -2.8303745, -0.2717497, 5.2~
+## $ b1_GCVI   &lt;dbl&gt; 0.8883052, -2.2323170, 5.9253740, -5.7838035, -3.2403061, 1.~
+data_x &lt;- full_join(data_1,data_2, by = c(&quot;ï..n&quot;,&quot;latitude&quot;,&quot;longitude&quot;,&quot;class&quot;))
+data_x |&gt; glimpse()
+## Rows: 100
+## Columns: 6
+## $ ï..n      &lt;int&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 1~
+## $ latitude  &lt;dbl&gt; -28.59329, -30.87459, -28.84481, -30.65571, -28.85978, -28.4~
+## $ longitude &lt;dbl&gt; -52.64978, -51.72551, -53.46126, -55.11848, -53.61491, -55.0~
+## $ class     &lt;chr&gt; &quot;soybean&quot;, &quot;soybean&quot;, &quot;soybean&quot;, &quot;soybean&quot;, &quot;soybean&quot;, &quot;soyb~
+## $ b0_GCVI   &lt;dbl&gt; -1.48824394, -1.07909429, 0.16900872, -0.92421901, -0.671991~
+## $ b1_GCVI   &lt;dbl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, ~</code></pre>
 </div>
-<div id="logistic-regression" class="section level2">
-<h2>Logistic regression</h2>
-<pre class="r"><code>lg_fit_x &lt;- glm(as.factor(class) ~ b4_GCVI, family=&quot;binomial&quot;, data=data)
-summary(lg_fit_x)
-## 
-## Call:
-## glm(formula = as.factor(class) ~ b4_GCVI, family = &quot;binomial&quot;, 
-##     data = data)
-## 
-## Deviance Residuals: 
-##      Min        1Q    Median        3Q       Max  
-## -1.91207  -0.04298   0.01134   0.32227   1.86651  
-## 
-## Coefficients:
-##             Estimate Std. Error z value Pr(&gt;|z|)    
-## (Intercept)  -3.5734     1.1155  -3.203  0.00136 ** 
-## b4_GCVI      -1.5677     0.3778  -4.150 3.33e-05 ***
-## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
-## 
-## (Dispersion parameter for binomial family taken to be 1)
-## 
-##     Null deviance: 138.629  on 99  degrees of freedom
-## Residual deviance:  42.379  on 98  degrees of freedom
-## AIC: 46.379
-## 
-## Number of Fisher Scoring iterations: 7</code></pre>
 </div>
-<div id="logistic-regression-by-tidymodels-workflow" class="section level2">
-<h2>Logistic regression by tidymodels workflow</h2>
-<div id="creating-a-parsnip-specification-for-a-logistic-regression-model" class="section level4">
-<h4>Creating a parsnip specification for a logistic regression model</h4>
-<pre class="r"><code>lg_model &lt;- logistic_reg() |&gt; 
-        set_engine(&quot;glm&quot;) |&gt; 
-        set_mode(&quot;classification&quot;)</code></pre>
+<div id="unite" class="section level1">
+<h1>Unite</h1>
+<div id="unite-function-unites-the-values-of-two-columns-into-one." class="section level2">
+<h2><code>unite</code> function unites the values of two columns into one.</h2>
 </div>
-<div id="fitting-the-model-supplying-a-formula-expression-and-the-data-1" class="section level4">
-<h4>Fitting the model supplying a formula expression and the data</h4>
-<pre class="r"><code>lg_fit &lt;- lg_model |&gt; 
-          fit(as.factor(class) ~ b4_GCVI, data = data)</code></pre>
+<div id="when-we-would-like-to-unite-two-columns-to-use-as-a-merged-column-we-can-use-unite-function." class="section level2">
+<h2>When we would like to unite two columns to use as a merged column we can use <code>unite</code> function.</h2>
+<pre class="r"><code>data |&gt; unite (&quot;n_class&quot;,ï..n,class,sep=&quot;_&quot;) -&gt; data_united
+data_united |&gt; head(6)
+##     n_class  latitude longitude    b0_GCVI   b1_GCVI    b2_GCVI    b3_GCVI
+## 1 1_soybean -28.59329 -52.64978 -1.4882439 -3.811363  -6.338071  1.2918025
+## 2 2_soybean -30.87459 -51.72551 -1.0790943 -1.828730  -4.837896  2.0158091
+## 3 3_soybean -28.84481 -53.46126  0.1690087 -2.050998  -2.741627 -1.1819744
+## 4 4_soybean -30.65571 -55.11848 -0.9242190 -2.597677  -4.246418  0.8886908
+## 5 5_soybean -28.85978 -53.61491 -0.6719911 -2.803353  -4.301278 -0.2094595
+## 6 6_soybean -28.41732 -55.03171 -5.1542411 -7.344623 -10.879841  2.6003060
+##     b4_GCVI
+## 1 -4.631691
+## 2 -2.661626
+## 3 -2.707749
+## 4 -3.352147
+## 5 -3.434427
+## 6 -7.331731</code></pre>
 </div>
-<div id="summary-of-the-model-1" class="section level4">
-<h4>Summary of the model</h4>
-<pre class="r"><code>lg_fit |&gt; 
-  pluck(&quot;fit&quot;) |&gt; 
-  summary()
-## 
-## Call:
-## stats::glm(formula = as.factor(class) ~ b4_GCVI, family = stats::binomial, 
-##     data = data)
-## 
-## Deviance Residuals: 
-##      Min        1Q    Median        3Q       Max  
-## -1.91207  -0.04298   0.01134   0.32227   1.86651  
-## 
-## Coefficients:
-##             Estimate Std. Error z value Pr(&gt;|z|)    
-## (Intercept)  -3.5734     1.1155  -3.203  0.00136 ** 
-## b4_GCVI      -1.5677     0.3778  -4.150 3.33e-05 ***
-## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
-## 
-## (Dispersion parameter for binomial family taken to be 1)
-## 
-##     Null deviance: 138.629  on 99  degrees of freedom
-## Residual deviance:  42.379  on 98  degrees of freedom
-## AIC: 46.379
-## 
-## Number of Fisher Scoring iterations: 7
-# Also you can use
-lg_fit$fit |&gt; summary()
-## 
-## Call:
-## stats::glm(formula = as.factor(class) ~ b4_GCVI, family = stats::binomial, 
-##     data = data)
-## 
-## Deviance Residuals: 
-##      Min        1Q    Median        3Q       Max  
-## -1.91207  -0.04298   0.01134   0.32227   1.86651  
-## 
-## Coefficients:
-##             Estimate Std. Error z value Pr(&gt;|z|)    
-## (Intercept)  -3.5734     1.1155  -3.203  0.00136 ** 
-## b4_GCVI      -1.5677     0.3778  -4.150 3.33e-05 ***
-## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
-## 
-## (Dispersion parameter for binomial family taken to be 1)
-## 
-##     Null deviance: 138.629  on 99  degrees of freedom
-## Residual deviance:  42.379  on 98  degrees of freedom
-## AIC: 46.379
-## 
-## Number of Fisher Scoring iterations: 7</code></pre>
 </div>
-<div id="parameter-estimates-of-a-the-lm-object-1" class="section level4">
-<h4>Parameter estimates of a the lm object</h4>
-<pre class="r"><code>tidy(lg_fit)
-## # A tibble: 2 x 5
-##   term        estimate std.error statistic   p.value
-##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
-## 1 (Intercept)    -3.57     1.12      -3.20 0.00136  
-## 2 b4_GCVI        -1.57     0.378     -4.15 0.0000333</code></pre>
+<div id="separate" class="section level1">
+<h1>Separate</h1>
+<div id="separate-function-separates-a-character-column-into-multiple-columns-with-a-regular-expression-or-numeric-locations." class="section level2">
+<h2><code>separate</code> function separates a character column into multiple columns with a regular expression or numeric locations.</h2>
 </div>
-<div id="extract-the-model-statistics-1" class="section level4">
-<h4>Extract the model statistics</h4>
-<pre class="r"><code>glance(lg_fit)
-## # A tibble: 1 x 8
-##   null.deviance df.null logLik   AIC   BIC deviance df.residual  nobs
-##           &lt;dbl&gt;   &lt;int&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;       &lt;int&gt; &lt;int&gt;
-## 1          139.      99  -21.2  46.4  51.6     42.4          98   100</code></pre>
+<div id="when-we-would-like-to-separate-a-column-to-have-two-or-more-columns-we-can-use-the-separate-function" class="section level2">
+<h2>When we would like to separate a column to have two or more columns, we can use the <code>separate</code> function</h2>
+<pre class="r"><code>data_united |&gt; separate(n_class,c(&quot;ï..n&quot;,&quot;class&quot;),sep=&quot;_&quot;) |&gt; head(6)
+##   ï..n   class  latitude longitude    b0_GCVI   b1_GCVI    b2_GCVI    b3_GCVI
+## 1    1 soybean -28.59329 -52.64978 -1.4882439 -3.811363  -6.338071  1.2918025
+## 2    2 soybean -30.87459 -51.72551 -1.0790943 -1.828730  -4.837896  2.0158091
+## 3    3 soybean -28.84481 -53.46126  0.1690087 -2.050998  -2.741627 -1.1819744
+## 4    4 soybean -30.65571 -55.11848 -0.9242190 -2.597677  -4.246418  0.8886908
+## 5    5 soybean -28.85978 -53.61491 -0.6719911 -2.803353  -4.301278 -0.2094595
+## 6    6 soybean -28.41732 -55.03171 -5.1542411 -7.344623 -10.879841  2.6003060
+##     b4_GCVI
+## 1 -4.631691
+## 2 -2.661626
+## 3 -2.707749
+## 4 -3.352147
+## 5 -3.434427
+## 6 -7.331731</code></pre>
 </div>
+</div>
+<div id="gather" class="section level1">
+<h1>Gather</h1>
+<div id="gather-function-gathers-columns-into-key-value-pairs." class="section level2">
+<h2><code>gather</code> function gathers columns into key-value pairs.</h2>
+</div>
+<div id="when-we-would-like-to-gather-columns-into-two-new-columns-containing-a-specific-column-name-and-the-respectively-column-values-we-can-use-the-gather-function." class="section level2">
+<h2>When we would like to gather columns into two new columns containing a specific column name and the respectively column values we can use the <code>gather</code> function.</h2>
+<pre class="r"><code>data |&gt; gather(key=&quot;Feature&quot;,value=&quot;Value&quot;,b0_GCVI:b4_GCVI) -&gt; data_gathered
+data_gathered |&gt; head(6)
+##   ï..n  latitude longitude   class Feature      Value
+## 1    1 -28.59329 -52.64978 soybean b0_GCVI -1.4882439
+## 2    2 -30.87459 -51.72551 soybean b0_GCVI -1.0790943
+## 3    3 -28.84481 -53.46126 soybean b0_GCVI  0.1690087
+## 4    4 -30.65571 -55.11848 soybean b0_GCVI -0.9242190
+## 5    5 -28.85978 -53.61491 soybean b0_GCVI -0.6719911
+## 6    6 -28.41732 -55.03171 soybean b0_GCVI -5.1542411</code></pre>
+</div>
+</div>
+<div id="spread" class="section level1">
+<h1>Spread</h1>
+<div id="spread-function-spreads-a-key-value-pair-across-multiple-columns." class="section level2">
+<h2><code>spread</code> function spreads a key-value pair across multiple columns.</h2>
+</div>
+<div id="when-we-need-to-distribute-the-pair-of-key-value-columns-into-a-field-of-cells-we-can-use-the-spread-function." class="section level2">
+<h2>When we need to distribute the pair of key-value columns into a field of cells we can use the <code>spread</code> function.</h2>
+<pre class="r"><code>data_gathered %&gt;% spread(key = Feature,value = Value) |&gt; head(6)
+##   ï..n  latitude longitude   class    b0_GCVI   b1_GCVI    b2_GCVI    b3_GCVI
+## 1    1 -28.59329 -52.64978 soybean -1.4882439 -3.811363  -6.338071  1.2918025
+## 2    2 -30.87459 -51.72551 soybean -1.0790943 -1.828730  -4.837896  2.0158091
+## 3    3 -28.84481 -53.46126 soybean  0.1690087 -2.050998  -2.741627 -1.1819744
+## 4    4 -30.65571 -55.11848 soybean -0.9242190 -2.597677  -4.246418  0.8886908
+## 5    5 -28.85978 -53.61491 soybean -0.6719911 -2.803353  -4.301278 -0.2094595
+## 6    6 -28.41732 -55.03171 soybean -5.1542411 -7.344623 -10.879841  2.6003060
+##     b4_GCVI
+## 1 -4.631691
+## 2 -2.661626
+## 3 -2.707749
+## 4 -3.352147
+## 5 -3.434427
+## 6 -7.331731</code></pre>
+</div>
+</div>
+<div id="final" class="section level1">
+<h1>Final</h1>
+<div id="here-are-the-most-common-functions-for-data-wrangling-utilizing-tidyverse-package." class="section level3">
+<h3>Here are the most common functions for data wrangling utilizing tidyverse package.</h3>
 </div>
 </div>

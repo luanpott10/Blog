@@ -1,0 +1,352 @@
+---
+title: "R - Data visualization, linear regression and logistic regression"
+author: admin
+date: 2021-09-23
+image:
+  caption: 'Image credit: Pott L.P.'
+  focal_point: ""
+  placement: 1
+  preview_only: false
+subtitle: 'Welcome. In this post, I am going to show you how you may create point maps, linear regression and logistic regression utilizing R base tools and tidymodels workflow.'
+summary: 'Welcome. In this post, I am going to show you how you may create point maps, linear regression and logistic regression utilizing R base tools and tidymodels workflow.'
+  
+categories: ["R"]
+tags: ["R Markdown", "tidyverse", "maps", "tidymodels"]
+---
+
+<script src="{{< blogdown/postref >}}index.en_files/header-attrs/header-attrs.js"></script>
+
+
+<div id="data-visualization-linear-regression-and-logistic-regression" class="section level1">
+<h1>Data visualization, linear regression and logistic regression</h1>
+<div id="crop-data-collection---ground-truth-and-remote-sensing" class="section level2">
+<h2>Crop data collection - ground truth and remote sensing</h2>
+</div>
+<div id="loading-the-packages" class="section level2">
+<h2>Loading the packages</h2>
+<pre class="r"><code>library(tidyverse)
+library(tidymodels)
+library(sf)
+library(geobr)</code></pre>
+</div>
+<div id="url-link-of-data-from-data-collection-and-remote-sensing-on-github-httpsgithub.comluanpott10class" class="section level2">
+<h2>URL link of data from data collection and remote sensing on GitHub <a href="https://github.com/luanpott10/Class" class="uri">https://github.com/luanpott10/Class</a></h2>
+</div>
+<div id="you-will-need-the-raw-file-httpsraw.githubusercontent.comluanpott10classmaindata_crops.csv" class="section level2">
+<h2>You will need the raw file <a href="https://raw.githubusercontent.com/luanpott10/Class/main/data_crops.csv" class="uri">https://raw.githubusercontent.com/luanpott10/Class/main/data_crops.csv</a></h2>
+</div>
+<div id="loading-the-data" class="section level2">
+<h2>Loading the data</h2>
+<pre class="r"><code>data &lt;- read.csv(&quot;https://raw.githubusercontent.com/luanpott10/Class/main/data_crops.csv&quot;)</code></pre>
+</div>
+<div id="plot-the-data-in-the-map" class="section level2">
+<h2>Plot the data in the map</h2>
+<pre class="r"><code>cities_RS &lt;- read_municipality(code_muni = &quot;RS&quot;, year= 2020)
+
+ggplot()+
+  geom_sf(data=cities_RS)+
+  geom_point(data=data,aes(x=longitude,y=latitude,fill=class),shape=22,size=2)+
+  labs(x= &quot;Longitude&quot;, y = &quot;Latitude&quot;)+
+  scale_fill_manual(values = c(&quot;#eded0c&quot;, &quot;#49a345&quot;))+
+  theme(legend.position = c(0.17, 0.2),
+        panel.border = element_rect(color=&quot;Black&quot;, fill = NA),
+        panel.background = element_rect(fill = &quot;#f2f2f2&quot;),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.title.x = element_text(family = &quot;serif&quot;,
+                                    colour = &quot;#000000&quot;,size = 22.0),
+        axis.text.x = element_text(family = &quot;serif&quot;,
+                                   colour = &quot;#000000&quot;,size = 18.0),
+        axis.title.y = element_text(family = &quot;serif&quot;,
+                                    colour = &quot;#000000&quot;,size = 22.0),
+        axis.text.y = element_text(family = &quot;serif&quot;,
+                                   colour = &quot;#000000&quot;,size = 18.0),
+        legend.title = element_text(family = &quot;serif&quot;,
+                                    colour = &#39;#000000&#39;,size = 12.0),
+        legend.text = element_text(family = &quot;serif&quot;,
+                                   colour = &#39;#000000&#39;,size = 12.0),
+        legend.background = element_rect(fill=&quot;#f2f2f2&quot;,
+                                  linetype=&quot;dashed&quot;, 
+                                  colour =&quot;#f2f2f2&quot;))</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-3-1.png" width="480" /></p>
+</div>
+<div id="plot-the-data-variables---continuous-x-continuous" class="section level2">
+<h2>Plot the data variables - continuous x continuous</h2>
+<pre class="r"><code>ggplot(data=data,aes(x=b3_GCVI,y=b4_GCVI))+
+  geom_point(aes(fill=class),shape=22,size=2)+
+  scale_fill_manual(values = c(&quot;#eded0c&quot;, &quot;#49a345&quot;))+
+  
+  stat_smooth(formula = y~x, method=&quot;lm&quot;, se=FALSE,color=&quot;black&quot;, linetype=&#39;dashed&#39;)+
+
+  theme(panel.border = element_rect(color=&quot;Black&quot;, fill = NA),
+        panel.background = element_rect(fill = &quot;#f2f2f2&quot;),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.title.x = element_text(family = &quot;serif&quot;,
+                                    colour = &quot;#000000&quot;,size = 22.0),
+        axis.text.x = element_text(family = &quot;serif&quot;,
+                                   colour = &quot;#000000&quot;,size = 18.0),
+        axis.title.y = element_text(family = &quot;serif&quot;,
+                                    colour = &quot;#000000&quot;,size = 22.0),
+        axis.text.y = element_text(family = &quot;serif&quot;,
+                                   colour = &quot;#000000&quot;,size = 18.0),
+        legend.title = element_text(family = &quot;serif&quot;,
+                                    colour = &#39;#000000&#39;,size = 12.0),
+        legend.text = element_text(family = &quot;serif&quot;,
+                                   colour = &#39;#000000&#39;,size = 12.0),
+        legend.background = element_rect(fill=&quot;#f2f2f2&quot;,
+                                  linetype=&quot;dashed&quot;, 
+                                  colour =&quot;#f2f2f2&quot;))</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+</div>
+<div id="linear-regression" class="section level2">
+<h2>Linear regression</h2>
+<pre class="r"><code>lm_fit_x &lt;- lm(b3_GCVI ~ b4_GCVI, data = data)
+summary(lm_fit_x)
+## 
+## Call:
+## lm(formula = b3_GCVI ~ b4_GCVI, data = data)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -3.7924 -0.9983 -0.0018  0.9525  3.9586 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -0.73701    0.15933  -4.626 1.14e-05 ***
+## b4_GCVI     -0.49793    0.04352 -11.440  &lt; 2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 1.475 on 98 degrees of freedom
+## Multiple R-squared:  0.5718, Adjusted R-squared:  0.5675 
+## F-statistic: 130.9 on 1 and 98 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+<div id="linear-regression-by-tidymodels-workflow" class="section level2">
+<h2>Linear regression by tidymodels workflow</h2>
+<div id="creating-a-parsnip-specification-for-a-linear-regression-model" class="section level4">
+<h4>Creating a parsnip specification for a linear regression model</h4>
+<pre class="r"><code>lm_model &lt;- linear_reg() |&gt; 
+            set_engine(&#39;lm&#39;) |&gt; 
+            set_mode(&#39;regression&#39;)</code></pre>
+</div>
+<div id="fitting-the-model-supplying-a-formula-expression-and-the-data" class="section level4">
+<h4>Fitting the model supplying a formula expression and the data</h4>
+<pre class="r"><code>lm_fit &lt;- lm_model %&gt;% 
+          fit(b3_GCVI ~ b4_GCVI, data = data)</code></pre>
+</div>
+<div id="summary-of-the-model" class="section level4">
+<h4>Summary of the model</h4>
+<pre class="r"><code>lm_fit |&gt; 
+  pluck(&quot;fit&quot;) |&gt; 
+  summary()
+## 
+## Call:
+## stats::lm(formula = b3_GCVI ~ b4_GCVI, data = data)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -3.7924 -0.9983 -0.0018  0.9525  3.9586 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -0.73701    0.15933  -4.626 1.14e-05 ***
+## b4_GCVI     -0.49793    0.04352 -11.440  &lt; 2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 1.475 on 98 degrees of freedom
+## Multiple R-squared:  0.5718, Adjusted R-squared:  0.5675 
+## F-statistic: 130.9 on 1 and 98 DF,  p-value: &lt; 2.2e-16
+# Also you can use
+lm_fit$fit |&gt; summary()
+## 
+## Call:
+## stats::lm(formula = b3_GCVI ~ b4_GCVI, data = data)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -3.7924 -0.9983 -0.0018  0.9525  3.9586 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -0.73701    0.15933  -4.626 1.14e-05 ***
+## b4_GCVI     -0.49793    0.04352 -11.440  &lt; 2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 1.475 on 98 degrees of freedom
+## Multiple R-squared:  0.5718, Adjusted R-squared:  0.5675 
+## F-statistic: 130.9 on 1 and 98 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+<div id="parameter-estimates-of-a-the-lm-object" class="section level4">
+<h4>Parameter estimates of a the lm object</h4>
+<pre class="r"><code>tidy(lm_fit)
+## # A tibble: 2 x 5
+##   term        estimate std.error statistic  p.value
+##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+## 1 (Intercept)   -0.737    0.159      -4.63 1.14e- 5
+## 2 b4_GCVI       -0.498    0.0435    -11.4  9.39e-20</code></pre>
+</div>
+<div id="extract-the-model-statistics" class="section level4">
+<h4>Extract the model statistics</h4>
+<pre class="r"><code>glance(lm_fit)
+## # A tibble: 1 x 12
+##   r.squared adj.r.squared sigma statistic  p.value    df logLik   AIC   BIC
+##       &lt;dbl&gt;         &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+## 1     0.572         0.567  1.47      131. 9.39e-20     1  -180.  365.  373.
+## # ... with 3 more variables: deviance &lt;dbl&gt;, df.residual &lt;int&gt;, nobs &lt;int&gt;</code></pre>
+</div>
+</div>
+<div id="plot-the-data-variables---categorical-x-continuous" class="section level2">
+<h2>Plot the data variables - categorical x continuous</h2>
+<pre class="r"><code>data &lt;- data |&gt; mutate(target = case_when(class == &quot;corn&quot; ~ 0,
+                                          class == &quot;soybean&quot; ~ 1))
+
+ggplot(data=data, aes(y=target,x=b4_GCVI))+
+  geom_point(aes(fill=as.factor(target)),shape=22,size=2) +
+  scale_fill_manual(values = c(&quot;#eded0c&quot;, &quot;#49a345&quot;))+
+  scale_y_continuous(breaks=c(0,1),
+                   labels=c(&quot;0&quot;,&quot;1&quot;),
+                   limits=c(0,1))+
+
+  stat_smooth(formula = y~x, method=&quot;glm&quot;, se=FALSE, method.args = list(family=binomial),
+              color=&quot;black&quot;, linetype=&#39;dashed&#39;)+
+  labs(x= &quot;b4_GCVI&quot;, y = &quot;Class&quot;,fill=&quot;Class&quot;)+
+
+  theme(legend.position = c(0.17, 0.2),
+        panel.border = element_rect(color=&quot;Black&quot;, fill = NA),
+        panel.background = element_rect(fill = &quot;#f2f2f2&quot;),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.title.x = element_text(family = &quot;serif&quot;,
+                                    colour = &quot;#000000&quot;,size = 22.0),
+        axis.text.x = element_text(family = &quot;serif&quot;,
+                                   colour = &quot;#000000&quot;,size = 18.0),
+        axis.title.y = element_text(family = &quot;serif&quot;,
+                                    colour = &quot;#000000&quot;,size = 22.0),
+        axis.text.y = element_text(family = &quot;serif&quot;,
+                                   colour = &quot;#000000&quot;,size = 18.0),
+        legend.title = element_text(family = &quot;serif&quot;,
+                                    colour = &#39;#000000&#39;,size = 12.0),
+        legend.text = element_text(family = &quot;serif&quot;,
+                                   colour = &#39;#000000&#39;,size = 12.0),
+        legend.background = element_rect(fill=&quot;#f2f2f2&quot;,
+                                  linetype=&quot;dashed&quot;, 
+                                  colour =&quot;#f2f2f2&quot;))</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-11-1.png" width="480" /></p>
+</div>
+<div id="logistic-regression" class="section level2">
+<h2>Logistic regression</h2>
+<pre class="r"><code>lg_fit_x &lt;- glm(as.factor(class) ~ b4_GCVI, family=&quot;binomial&quot;, data=data)
+summary(lg_fit_x)
+## 
+## Call:
+## glm(formula = as.factor(class) ~ b4_GCVI, family = &quot;binomial&quot;, 
+##     data = data)
+## 
+## Deviance Residuals: 
+##      Min        1Q    Median        3Q       Max  
+## -1.91207  -0.04298   0.01134   0.32227   1.86651  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)  -3.5734     1.1155  -3.203  0.00136 ** 
+## b4_GCVI      -1.5677     0.3778  -4.150 3.33e-05 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 138.629  on 99  degrees of freedom
+## Residual deviance:  42.379  on 98  degrees of freedom
+## AIC: 46.379
+## 
+## Number of Fisher Scoring iterations: 7</code></pre>
+</div>
+<div id="logistic-regression-by-tidymodels-workflow" class="section level2">
+<h2>Logistic regression by tidymodels workflow</h2>
+<div id="creating-a-parsnip-specification-for-a-logistic-regression-model" class="section level4">
+<h4>Creating a parsnip specification for a logistic regression model</h4>
+<pre class="r"><code>lg_model &lt;- logistic_reg() |&gt; 
+        set_engine(&quot;glm&quot;) |&gt; 
+        set_mode(&quot;classification&quot;)</code></pre>
+</div>
+<div id="fitting-the-model-supplying-a-formula-expression-and-the-data-1" class="section level4">
+<h4>Fitting the model supplying a formula expression and the data</h4>
+<pre class="r"><code>lg_fit &lt;- lg_model |&gt; 
+          fit(as.factor(class) ~ b4_GCVI, data = data)</code></pre>
+</div>
+<div id="summary-of-the-model-1" class="section level4">
+<h4>Summary of the model</h4>
+<pre class="r"><code>lg_fit |&gt; 
+  pluck(&quot;fit&quot;) |&gt; 
+  summary()
+## 
+## Call:
+## stats::glm(formula = as.factor(class) ~ b4_GCVI, family = stats::binomial, 
+##     data = data)
+## 
+## Deviance Residuals: 
+##      Min        1Q    Median        3Q       Max  
+## -1.91207  -0.04298   0.01134   0.32227   1.86651  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)  -3.5734     1.1155  -3.203  0.00136 ** 
+## b4_GCVI      -1.5677     0.3778  -4.150 3.33e-05 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 138.629  on 99  degrees of freedom
+## Residual deviance:  42.379  on 98  degrees of freedom
+## AIC: 46.379
+## 
+## Number of Fisher Scoring iterations: 7
+# Also you can use
+lg_fit$fit |&gt; summary()
+## 
+## Call:
+## stats::glm(formula = as.factor(class) ~ b4_GCVI, family = stats::binomial, 
+##     data = data)
+## 
+## Deviance Residuals: 
+##      Min        1Q    Median        3Q       Max  
+## -1.91207  -0.04298   0.01134   0.32227   1.86651  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)  -3.5734     1.1155  -3.203  0.00136 ** 
+## b4_GCVI      -1.5677     0.3778  -4.150 3.33e-05 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 138.629  on 99  degrees of freedom
+## Residual deviance:  42.379  on 98  degrees of freedom
+## AIC: 46.379
+## 
+## Number of Fisher Scoring iterations: 7</code></pre>
+</div>
+<div id="parameter-estimates-of-a-the-lm-object-1" class="section level4">
+<h4>Parameter estimates of a the lm object</h4>
+<pre class="r"><code>tidy(lg_fit)
+## # A tibble: 2 x 5
+##   term        estimate std.error statistic   p.value
+##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+## 1 (Intercept)    -3.57     1.12      -3.20 0.00136  
+## 2 b4_GCVI        -1.57     0.378     -4.15 0.0000333</code></pre>
+</div>
+<div id="extract-the-model-statistics-1" class="section level4">
+<h4>Extract the model statistics</h4>
+<pre class="r"><code>glance(lg_fit)
+## # A tibble: 1 x 8
+##   null.deviance df.null logLik   AIC   BIC deviance df.residual  nobs
+##           &lt;dbl&gt;   &lt;int&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;       &lt;int&gt; &lt;int&gt;
+## 1          139.      99  -21.2  46.4  51.6     42.4          98   100</code></pre>
+</div>
+</div>
+</div>

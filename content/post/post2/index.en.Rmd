@@ -1,221 +1,202 @@
 ---
-title: "R - Data visualization, linear regression and logistic regression"
+title: "R - Data wrangling utilizing the most common functions from tidyverse package collection"
 author: admin
-date: 2021-09-23
+date: 2021-10-14
 image:
   caption: 'Image credit: Pott L.P.'
   focal_point: ""
   placement: 1
-  preview_only: true
-subtitle: 'Welcome. In this post, I am going to show you how you may create point maps, linear regression and logistic regression utilizing R base tools and tidymodels workflow.'
-summary: 'Welcome. In this post, I am going to show you how you may create point maps, linear regression and logistic regression utilizing R base tools and tidymodels workflow.'
+  preview_only: false
+subtitle: 'Welcome. In this post, I am going to show you how you may make data wrangling from a dataset utilizing the dplyr, plyr, and tidyr packages from tidyverse package collection.'
+summary: 'Welcome. In this post, I am going to show you how you may make data wrangling from a dataset utilizing the dplyr, plyr, and tidyr packages from tidyverse package collection.'
   
 categories: ["R"]
-tags: ["R Markdown", "tidyverse", "maps", "tidymodels"]
+tags: ["R Markdown", "data wrangling", "tidyverse"]
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(collapse = TRUE)
 ```
 
-# Data visualization, linear regression and logistic regression
-## Crop data collection - ground truth and remote sensing
+# Data wrangling utilizing the most common functions from tidyverse package collection.
 
-## Loading the packages
+# Loading the package
 ```{r message=FALSE, warning=FALSE}
 library(tidyverse)
-library(tidymodels)
-library(sf)
-library(geobr)
 ```
 
-## URL link of data from data collcetion and remote sensing on GitHub <https://github.com/luanpott10/Class>
+URL link of data from data collection and remote sensing on GitHub <https://github.com/luanpott10/Class>
+You will need the raw file <https://raw.githubusercontent.com/luanpott10/Class/main/data_crops.csv>
 
-## You will nedd the raw file <https://raw.githubusercontent.com/luanpott10/Class/main/data_crops.csv>
-
-## Loading the data
+# Loading the data
 ```{r}
 data <- read.csv("https://raw.githubusercontent.com/luanpott10/Class/main/data_crops.csv")
 ```
 
-## Plot the data in the map
-```{r fig.height=5, fig.width=5, message=FALSE, warning=FALSE, results='hide'}
-cities_RS <- read_municipality(code_muni = "RS", year= 2020)
-
-ggplot()+
-  geom_sf(data=cities_RS)+
-  geom_point(data=data,aes(x=longitude,y=latitude,fill=class),shape=22,size=2)+
-  labs(x= "Longitude", y = "Latitude")+
-  scale_fill_manual(values = c("#eded0c", "#49a345"))+
-  theme(legend.position = c(0.17, 0.2),
-        panel.border = element_rect(color="Black", fill = NA),
-        panel.background = element_rect(fill = "#f2f2f2"),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        axis.title.x = element_text(family = "serif",
-                                    colour = "#000000",size = 22.0),
-        axis.text.x = element_text(family = "serif",
-                                   colour = "#000000",size = 18.0),
-        axis.title.y = element_text(family = "serif",
-                                    colour = "#000000",size = 22.0),
-        axis.text.y = element_text(family = "serif",
-                                   colour = "#000000",size = 18.0),
-        legend.title = element_text(family = "serif",
-                                    colour = '#000000',size = 12.0),
-        legend.text = element_text(family = "serif",
-                                   colour = '#000000',size = 12.0),
-        legend.background = element_rect(fill="#f2f2f2",
-                                  linetype="dashed", 
-                                  colour ="#f2f2f2"))
-```
-
-## Plot the data variables - continuous x continuous
-```{r fig.height=5, fig.width=7}
-ggplot(data=data,aes(x=b3_GCVI,y=b4_GCVI))+
-  geom_point(aes(fill=class),shape=22,size=2)+
-  scale_fill_manual(values = c("#eded0c", "#49a345"))+
-  
-  stat_smooth(formula = y~x, method="lm", se=FALSE,color="black", linetype='dashed')+
-
-  theme(panel.border = element_rect(color="Black", fill = NA),
-        panel.background = element_rect(fill = "#f2f2f2"),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        axis.title.x = element_text(family = "serif",
-                                    colour = "#000000",size = 22.0),
-        axis.text.x = element_text(family = "serif",
-                                   colour = "#000000",size = 18.0),
-        axis.title.y = element_text(family = "serif",
-                                    colour = "#000000",size = 22.0),
-        axis.text.y = element_text(family = "serif",
-                                   colour = "#000000",size = 18.0),
-        legend.title = element_text(family = "serif",
-                                    colour = '#000000',size = 12.0),
-        legend.text = element_text(family = "serif",
-                                   colour = '#000000',size = 12.0),
-        legend.background = element_rect(fill="#f2f2f2",
-                                  linetype="dashed", 
-                                  colour ="#f2f2f2"))
-```
-
-## Linear regression
+# A rapid view of the data
+## Functions that can be used
+##### `glimpse()`
+##### `head()`
+##### `tail()`
+##### `summary()`
 ```{r}
-lm_fit_x <- lm(b3_GCVI ~ b4_GCVI, data = data)
-summary(lm_fit_x)
+data |> glimpse()
+
+data |> head(5)
+data |> tail(5)
+
+data |> summary()
 ```
 
-## Linear regression by tidymodels workflow
-#### Creating a parsnip specification for a linear regression model
+# Select
+## `select` function is used for selecting columns in a data frame.
+## Here I brought you some examples of the `select` function for selecting different columns in different ways.
 ```{r}
-lm_model <- linear_reg() |> 
-            set_engine('lm') |> 
-            set_mode('regression')
+data |> select(1) |> head(6)
+data |> select(last_col()) |> head(6)
+data |> select(c(class,b0_GCVI,b1_GCVI,b2_GCVI,b3_GCVI,b4_GCVI)) |> head(6)
+data |> select(-c(ï..n,latitude,longitude)) |> head(6)
+
+data |> select(starts_with("b")) |> head(6)
+data |> select(ends_with("GCVI")) |> head(6)
+
+data |> select(where(is.numeric)) |> head(6)
+
 ```
 
-#### Fitting the model supplying a formula expression and the data
+# Arrange
+## `arrange` function is used for orders the rows of a data frame by the values of selected columns.
+## In some cases we would like to see the ordered rows according a determined column, for that we use `arrange` function.
 ```{r}
-lm_fit <- lm_model %>% 
-          fit(b3_GCVI ~ b4_GCVI, data = data)
+data |> arrange(b4_GCVI) |> head(6)
 ```
 
-#### Summary of the model
+# Relocate
+## `relocate` function change column positions.
+## Generally in a machine learning model we have the last column as the label, for do that we can use the `relocate` function.
 ```{r}
-lm_fit |> 
-  pluck("fit") |> 
-  summary()
-
-# Also you can use
-lm_fit$fit |> summary()
+data |> relocate(-class) |> head(6)
 ```
 
-#### Parameter estimates of a the lm object
+# Filter
+## `filter` function is used to subset a data frame, retaining all rows that satisfy your conditions.
+## The most common operators that are useful to build the conditions are:
+##### `==`, `>`, `>=` 
+##### `&`, `|`, `!`, `xor()`
+##### `is.na()`
+##### `between()`, `near()`
+## We also may put more than one filter in the same `filter` function.
 ```{r}
-tidy(lm_fit)
+data |> filter(class == "soybean", b4_GCVI > -4) |> head(6)
 ```
 
-#### Extract the model statistics
+# Rename
+## `rename` changes the names of individual variables.
+## Column names in datasets should be short, inuitive and complete. For that many times we need to rename columns for the dataset.
 ```{r}
-glance(lm_fit)
+data |> rename(n = ï..n) |> head(6)
 ```
 
-## Plot the data variables - categorical x continuous
-```{r fig.height=5, fig.width=5}
-data <- data |> mutate(target = case_when(class == "corn" ~ 0,
-                                          class == "soybean" ~ 1))
-
-ggplot(data=data, aes(y=target,x=b4_GCVI))+
-  geom_point(aes(fill=as.factor(target)),shape=22,size=2) +
-  scale_fill_manual(values = c("#eded0c", "#49a345"))+
-  scale_y_continuous(breaks=c(0,1),
-                   labels=c("0","1"),
-                   limits=c(0,1))+
-
-  stat_smooth(formula = y~x, method="glm", se=FALSE, method.args = list(family=binomial),
-              color="black", linetype='dashed')+
-  labs(x= "b4_GCVI", y = "Class",fill="Class")+
-
-  theme(legend.position = c(0.17, 0.2),
-        panel.border = element_rect(color="Black", fill = NA),
-        panel.background = element_rect(fill = "#f2f2f2"),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        axis.title.x = element_text(family = "serif",
-                                    colour = "#000000",size = 22.0),
-        axis.text.x = element_text(family = "serif",
-                                   colour = "#000000",size = 18.0),
-        axis.title.y = element_text(family = "serif",
-                                    colour = "#000000",size = 22.0),
-        axis.text.y = element_text(family = "serif",
-                                   colour = "#000000",size = 18.0),
-        legend.title = element_text(family = "serif",
-                                    colour = '#000000',size = 12.0),
-        legend.text = element_text(family = "serif",
-                                   colour = '#000000',size = 12.0),
-        legend.background = element_rect(fill="#f2f2f2",
-                                  linetype="dashed", 
-                                  colour ="#f2f2f2"))
-```
-
-## Logistic regression
+# Summarise
+## `summarise` creates a new data frame. 
+## The objective of the function is summarise a data frame for an aspect.
+## The most common functions used into `summarise` function are:
+##### `mean()`, `median()`
+##### `sd()`, `IQR()`, `mad()`
+##### `min()`, `max()`, `quantile()`
+##### `first()`, `last()`, `nth()`
+##### `n()`, `n_distinct()`
+##### `any()`, `all()`
+## We also may put more than one function in `summarise` function.
 ```{r}
-lg_fit_x <- glm(as.factor(class) ~ b4_GCVI, family="binomial", data=data)
-summary(lg_fit_x)
+data |> summarise(n = n(), min = min(b4_GCVI), max = max(b4_GCVI), mean = mean(b4_GCVI))
 ```
 
-
-## Logistic regression by tidymodels workflow
-#### Creating a parsnip specification for a logistic regression model
+# Group by 
+## `group_by` takes an existing data frame and converts it into a grouped data frame where operations are performed by group. ungroup() removes grouping.
+## Generally the `group_by` function is used before the `summarise` function to generate summaries by group.
 ```{r}
-lg_model <- logistic_reg() |> 
-        set_engine("glm") |> 
-        set_mode("classification")
+data |> group_by(class) |> summarise(n = n(), min = min(b4_GCVI), max = max(b4_GCVI), mean = mean(b4_GCVI))
 ```
 
-#### Fitting the model supplying a formula expression and the data
+# Pull
+## `pull` selects a column in a data frame and transforms it into a vector.
+## When we are leading with data wrangling we can use `pull` function to extract columns as a vector.
 ```{r}
-lg_fit <- lg_model |> 
-          fit(as.factor(class) ~ b4_GCVI, data = data)
+data |> pull(b4_GCVI) |> head(6)
 ```
 
-#### Summary of the model
+# Across
+## `across` makes it easy to apply the same transformation to multiple columns.
+## Generally it is used into `summarise()` and `mutate()` functions.
+## In this example we are rounding to 2 decimals the double variables except latitude and longitude.
 ```{r}
-lg_fit |> 
-  pluck("fit") |> 
-  summary()
-
-# Also you can use
-lg_fit$fit |> summary()
+data |> 
+  mutate(across(where(is.double) & !c(latitude, longitude), ~ round(.x,2))) |> head(6)
 ```
 
-#### Parameter estimates of a the lm object
+# Join
+## `join` function joins two data frames together.
+## Joining tables, data frames with foreign key, the `by` in the `join` function is the most important for relational databases.
+## The types of join are:
+### `inner_join` : only rows with matching keys in both x and y;
+### `left_join` : all rows in x, adding matching columns from y;
+### `right_join` : all rows in y, adding matching columns from x;
+### `full_join` : all rows in x with matching columns in y, then the rows of y that don't match x.
+## You can se the differences with the below example.
 ```{r}
-tidy(lg_fit)
+data |> select(ï..n,latitude,longitude,class,b0_GCVI) -> data_1
+data |> select(ï..n,latitude,longitude,class,b1_GCVI) -> data_2
+
+data_1 <- data_1[1:60,]
+data_2 <- data_2[51:100,]
+
+data_x <- inner_join(data_1,data_2, by = c("ï..n","latitude","longitude","class"))
+data_x |> glimpse()
+data_x <- left_join(data_1,data_2, by = c("ï..n","latitude","longitude","class"))
+data_x |> glimpse()
+data_x <- right_join(data_1,data_2, by = c("ï..n","latitude","longitude","class"))
+data_x |> glimpse()
+data_x <- full_join(data_1,data_2, by = c("ï..n","latitude","longitude","class"))
+data_x |> glimpse()
+
 ```
 
-#### Extract the model statistics
+# Unite
+## `unite` function unites the values of two columns into one.
+## When we would like to unite two columns to use as a merged column we can use `unite` function.
 ```{r}
-glance(lg_fit)
+data |> unite ("n_class",ï..n,class,sep="_") -> data_united
+data_united |> head(6)
 ```
+
+# Separate
+## `separate` function separates a character column into multiple columns with a regular expression or numeric locations.
+## When we would like to separate a column to have two or more columns, we can use the `separate` function
+```{r}
+data_united |> separate(n_class,c("ï..n","class"),sep="_") |> head(6)
+```
+
+# Gather
+## `gather` function gathers columns into key-value pairs.
+## When we would like to gather columns into two new columns containing a specific column name and the respectively column values we can use the `gather` function.
+```{r}
+data |> gather(key="Feature",value="Value",b0_GCVI:b4_GCVI) -> data_gathered
+data_gathered |> head(6)
+```
+
+# Spread
+## `spread` function spreads a key-value pair across multiple columns.
+## When we need to distribute the pair of key-value columns into a field of cells we can use the `spread` function.
+```{r}
+data_gathered %>% spread(key = Feature,value = Value) |> head(6)
+```
+
+# Final
+### Here are the most common functions for data wrangling utilizing tidyverse package.
+
+
+
 
 
 

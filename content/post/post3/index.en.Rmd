@@ -1,0 +1,221 @@
+---
+title: "R - Data visualization, linear regression and logistic regression"
+author: admin
+date: 2021-09-23
+image:
+  caption: 'Image credit: Pott L.P.'
+  focal_point: ""
+  placement: 1
+  preview_only: false
+subtitle: 'Welcome. In this post, I am going to show you how you may create point maps, linear regression and logistic regression utilizing R base tools and tidymodels workflow.'
+summary: 'Welcome. In this post, I am going to show you how you may create point maps, linear regression and logistic regression utilizing R base tools and tidymodels workflow.'
+  
+categories: ["R"]
+tags: ["R Markdown", "tidyverse", "maps", "tidymodels"]
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE)
+```
+
+# Data visualization, linear regression and logistic regression
+## Crop data collection - ground truth and remote sensing
+
+## Loading the packages
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+library(tidymodels)
+library(sf)
+library(geobr)
+```
+
+## URL link of data from data collection and remote sensing on GitHub <https://github.com/luanpott10/Class>
+
+## You will need the raw file <https://raw.githubusercontent.com/luanpott10/Class/main/data_crops.csv>
+
+## Loading the data
+```{r}
+data <- read.csv("https://raw.githubusercontent.com/luanpott10/Class/main/data_crops.csv")
+```
+
+## Plot the data in the map
+```{r fig.height=5, fig.width=5, message=FALSE, warning=FALSE, results='hide'}
+cities_RS <- read_municipality(code_muni = "RS", year= 2020)
+
+ggplot()+
+  geom_sf(data=cities_RS)+
+  geom_point(data=data,aes(x=longitude,y=latitude,fill=class),shape=22,size=2)+
+  labs(x= "Longitude", y = "Latitude")+
+  scale_fill_manual(values = c("#eded0c", "#49a345"))+
+  theme(legend.position = c(0.17, 0.2),
+        panel.border = element_rect(color="Black", fill = NA),
+        panel.background = element_rect(fill = "#f2f2f2"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.title.x = element_text(family = "serif",
+                                    colour = "#000000",size = 22.0),
+        axis.text.x = element_text(family = "serif",
+                                   colour = "#000000",size = 18.0),
+        axis.title.y = element_text(family = "serif",
+                                    colour = "#000000",size = 22.0),
+        axis.text.y = element_text(family = "serif",
+                                   colour = "#000000",size = 18.0),
+        legend.title = element_text(family = "serif",
+                                    colour = '#000000',size = 12.0),
+        legend.text = element_text(family = "serif",
+                                   colour = '#000000',size = 12.0),
+        legend.background = element_rect(fill="#f2f2f2",
+                                  linetype="dashed", 
+                                  colour ="#f2f2f2"))
+```
+
+## Plot the data variables - continuous x continuous
+```{r fig.height=5, fig.width=7}
+ggplot(data=data,aes(x=b3_GCVI,y=b4_GCVI))+
+  geom_point(aes(fill=class),shape=22,size=2)+
+  scale_fill_manual(values = c("#eded0c", "#49a345"))+
+  
+  stat_smooth(formula = y~x, method="lm", se=FALSE,color="black", linetype='dashed')+
+
+  theme(panel.border = element_rect(color="Black", fill = NA),
+        panel.background = element_rect(fill = "#f2f2f2"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.title.x = element_text(family = "serif",
+                                    colour = "#000000",size = 22.0),
+        axis.text.x = element_text(family = "serif",
+                                   colour = "#000000",size = 18.0),
+        axis.title.y = element_text(family = "serif",
+                                    colour = "#000000",size = 22.0),
+        axis.text.y = element_text(family = "serif",
+                                   colour = "#000000",size = 18.0),
+        legend.title = element_text(family = "serif",
+                                    colour = '#000000',size = 12.0),
+        legend.text = element_text(family = "serif",
+                                   colour = '#000000',size = 12.0),
+        legend.background = element_rect(fill="#f2f2f2",
+                                  linetype="dashed", 
+                                  colour ="#f2f2f2"))
+```
+
+## Linear regression
+```{r}
+lm_fit_x <- lm(b3_GCVI ~ b4_GCVI, data = data)
+summary(lm_fit_x)
+```
+
+## Linear regression by tidymodels workflow
+#### Creating a parsnip specification for a linear regression model
+```{r}
+lm_model <- linear_reg() |> 
+            set_engine('lm') |> 
+            set_mode('regression')
+```
+
+#### Fitting the model supplying a formula expression and the data
+```{r}
+lm_fit <- lm_model %>% 
+          fit(b3_GCVI ~ b4_GCVI, data = data)
+```
+
+#### Summary of the model
+```{r}
+lm_fit |> 
+  pluck("fit") |> 
+  summary()
+
+# Also you can use
+lm_fit$fit |> summary()
+```
+
+#### Parameter estimates of a the lm object
+```{r}
+tidy(lm_fit)
+```
+
+#### Extract the model statistics
+```{r}
+glance(lm_fit)
+```
+
+## Plot the data variables - categorical x continuous
+```{r fig.height=5, fig.width=5}
+data <- data |> mutate(target = case_when(class == "corn" ~ 0,
+                                          class == "soybean" ~ 1))
+
+ggplot(data=data, aes(y=target,x=b4_GCVI))+
+  geom_point(aes(fill=as.factor(target)),shape=22,size=2) +
+  scale_fill_manual(values = c("#eded0c", "#49a345"))+
+  scale_y_continuous(breaks=c(0,1),
+                   labels=c("0","1"),
+                   limits=c(0,1))+
+
+  stat_smooth(formula = y~x, method="glm", se=FALSE, method.args = list(family=binomial),
+              color="black", linetype='dashed')+
+  labs(x= "b4_GCVI", y = "Class",fill="Class")+
+
+  theme(legend.position = c(0.17, 0.2),
+        panel.border = element_rect(color="Black", fill = NA),
+        panel.background = element_rect(fill = "#f2f2f2"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.title.x = element_text(family = "serif",
+                                    colour = "#000000",size = 22.0),
+        axis.text.x = element_text(family = "serif",
+                                   colour = "#000000",size = 18.0),
+        axis.title.y = element_text(family = "serif",
+                                    colour = "#000000",size = 22.0),
+        axis.text.y = element_text(family = "serif",
+                                   colour = "#000000",size = 18.0),
+        legend.title = element_text(family = "serif",
+                                    colour = '#000000',size = 12.0),
+        legend.text = element_text(family = "serif",
+                                   colour = '#000000',size = 12.0),
+        legend.background = element_rect(fill="#f2f2f2",
+                                  linetype="dashed", 
+                                  colour ="#f2f2f2"))
+```
+
+## Logistic regression
+```{r}
+lg_fit_x <- glm(as.factor(class) ~ b4_GCVI, family="binomial", data=data)
+summary(lg_fit_x)
+```
+
+
+## Logistic regression by tidymodels workflow
+#### Creating a parsnip specification for a logistic regression model
+```{r}
+lg_model <- logistic_reg() |> 
+        set_engine("glm") |> 
+        set_mode("classification")
+```
+
+#### Fitting the model supplying a formula expression and the data
+```{r}
+lg_fit <- lg_model |> 
+          fit(as.factor(class) ~ b4_GCVI, data = data)
+```
+
+#### Summary of the model
+```{r}
+lg_fit |> 
+  pluck("fit") |> 
+  summary()
+
+# Also you can use
+lg_fit$fit |> summary()
+```
+
+#### Parameter estimates of a the lm object
+```{r}
+tidy(lg_fit)
+```
+
+#### Extract the model statistics
+```{r}
+glance(lg_fit)
+```
+
+
+
