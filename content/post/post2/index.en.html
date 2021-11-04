@@ -284,6 +284,56 @@ data |&gt; select(where(is.numeric)) |&gt; head(6)
 ## 6 -7.331731</code></pre>
 </div>
 </div>
+<div id="mutate" class="section level1">
+<h1>Mutate</h1>
+<div id="mutate-is-utilized-to-create-or-transform-variables." class="section level2">
+<h2><code>mutate</code> is utilized to create or transform variables.</h2>
+</div>
+<div id="across-makes-it-easy-to-apply-the-same-transformation-to-multiple-columns." class="section level2">
+<h2><code>across</code> makes it easy to apply the same transformation to multiple columns.</h2>
+</div>
+<div id="across-generally-it-is-used-into-summarise-and-mutate-functions." class="section level2">
+<h2><code>across</code> generally it is used into <code>summarise()</code> and <code>mutate()</code> functions.</h2>
+</div>
+<div id="in-this-example-we-are-transforming---rounding-to-2-decimals-the-double-variables-except-latitude-and-longitude." class="section level2">
+<h2>In this example we are transforming - rounding to 2 decimals the double variables except latitude and longitude.</h2>
+<pre class="r"><code>data |&gt; 
+  mutate(across(where(is.double) &amp; !c(latitude, longitude), ~ round(.x,2))) |&gt; head(6)
+##   ï..n  latitude longitude   class b0_GCVI b1_GCVI b2_GCVI b3_GCVI b4_GCVI
+## 1    1 -28.59329 -52.64978 soybean   -1.49   -3.81   -6.34    1.29   -4.63
+## 2    2 -30.87459 -51.72551 soybean   -1.08   -1.83   -4.84    2.02   -2.66
+## 3    3 -28.84481 -53.46126 soybean    0.17   -2.05   -2.74   -1.18   -2.71
+## 4    4 -30.65571 -55.11848 soybean   -0.92   -2.60   -4.25    0.89   -3.35
+## 5    5 -28.85978 -53.61491 soybean   -0.67   -2.80   -4.30   -0.21   -3.43
+## 6    6 -28.41732 -55.03171 soybean   -5.15   -7.34  -10.88    2.60   -7.33</code></pre>
+</div>
+</div>
+<div id="recode" class="section level1">
+<h1>Recode</h1>
+<div id="recode-is-utilized-to-recodes-a-numeric-vector-character-vector-or-factor-according-to-simple-recode-specifications." class="section level2">
+<h2><code>recode</code> is utilized to recodes a numeric vector, character vector, or factor according to simple recode specifications.</h2>
+</div>
+<div id="for-more-complicated-criteria-use-case_when." class="section level2">
+<h2>For more complicated criteria, use <code>case_when()</code>.</h2>
+<pre class="r"><code>data |&gt; mutate(specie=recode(class,
+                             soybean=&quot;Glycine max&quot;,
+                             corn=&quot;Zea mays&quot;)) |&gt; head(6)
+##   ï..n  latitude longitude   class    b0_GCVI   b1_GCVI    b2_GCVI    b3_GCVI
+## 1    1 -28.59329 -52.64978 soybean -1.4882439 -3.811363  -6.338071  1.2918025
+## 2    2 -30.87459 -51.72551 soybean -1.0790943 -1.828730  -4.837896  2.0158091
+## 3    3 -28.84481 -53.46126 soybean  0.1690087 -2.050998  -2.741627 -1.1819744
+## 4    4 -30.65571 -55.11848 soybean -0.9242190 -2.597677  -4.246418  0.8886908
+## 5    5 -28.85978 -53.61491 soybean -0.6719911 -2.803353  -4.301278 -0.2094595
+## 6    6 -28.41732 -55.03171 soybean -5.1542411 -7.344623 -10.879841  2.6003060
+##     b4_GCVI      specie
+## 1 -4.631691 Glycine max
+## 2 -2.661626 Glycine max
+## 3 -2.707749 Glycine max
+## 4 -3.352147 Glycine max
+## 5 -3.434427 Glycine max
+## 6 -7.331731 Glycine max</code></pre>
+</div>
+</div>
 <div id="summarise" class="section level1">
 <h1>Summarise</h1>
 <div id="summarise-creates-a-new-data-frame." class="section level2">
@@ -344,27 +394,6 @@ data |&gt; select(where(is.numeric)) |&gt; head(6)
 <h2>When we are leading with data wrangling we can use <code>pull</code> function to extract columns as a vector.</h2>
 <pre class="r"><code>data |&gt; pull(b4_GCVI) |&gt; head(6)
 ## [1] -4.631691 -2.661626 -2.707749 -3.352147 -3.434427 -7.331731</code></pre>
-</div>
-</div>
-<div id="across" class="section level1">
-<h1>Across</h1>
-<div id="across-makes-it-easy-to-apply-the-same-transformation-to-multiple-columns." class="section level2">
-<h2><code>across</code> makes it easy to apply the same transformation to multiple columns.</h2>
-</div>
-<div id="generally-it-is-used-into-summarise-and-mutate-functions." class="section level2">
-<h2>Generally it is used into <code>summarise()</code> and <code>mutate()</code> functions.</h2>
-</div>
-<div id="in-this-example-we-are-rounding-to-2-decimals-the-double-variables-except-latitude-and-longitude." class="section level2">
-<h2>In this example we are rounding to 2 decimals the double variables except latitude and longitude.</h2>
-<pre class="r"><code>data |&gt; 
-  mutate(across(where(is.double) &amp; !c(latitude, longitude), ~ round(.x,2))) |&gt; head(6)
-##   ï..n  latitude longitude   class b0_GCVI b1_GCVI b2_GCVI b3_GCVI b4_GCVI
-## 1    1 -28.59329 -52.64978 soybean   -1.49   -3.81   -6.34    1.29   -4.63
-## 2    2 -30.87459 -51.72551 soybean   -1.08   -1.83   -4.84    2.02   -2.66
-## 3    3 -28.84481 -53.46126 soybean    0.17   -2.05   -2.74   -1.18   -2.71
-## 4    4 -30.65571 -55.11848 soybean   -0.92   -2.60   -4.25    0.89   -3.35
-## 5    5 -28.85978 -53.61491 soybean   -0.67   -2.80   -4.30   -0.21   -3.43
-## 6    6 -28.41732 -55.03171 soybean   -5.15   -7.34  -10.88    2.60   -7.33</code></pre>
 </div>
 </div>
 <div id="join" class="section level1">
