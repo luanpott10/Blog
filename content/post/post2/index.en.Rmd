@@ -97,6 +97,25 @@ data |> filter(class == "soybean", b4_GCVI > -4) |> head(6)
 data |> rename(n = ï..n) |> head(6)
 ```
 
+# Mutate
+## `mutate` is utilized to create or transform variables.
+## `across` makes it easy to apply the same transformation to multiple columns.
+## `across` generally it is used into `summarise()` and `mutate()` functions.
+## In this example we are transforming - rounding to 2 decimals the double variables except latitude and longitude.
+```{r}
+data |> 
+  mutate(across(where(is.double) & !c(latitude, longitude), ~ round(.x,2))) |> head(6)
+```
+
+# Recode
+## `recode` is utilized to recodes a numeric vector, character vector, or factor according to simple recode specifications.
+## For more complicated criteria, use `case_when()`.
+```{r}
+data |> mutate(specie=recode(class,
+                             soybean="Glycine max",
+                             corn="Zea mays")) |> head(6)
+```
+
 # Summarise
 ## `summarise` creates a new data frame. 
 ## The objective of the function is summarise a data frame for an aspect.
@@ -124,15 +143,6 @@ data |> group_by(class) |> summarise(n = n(), min = min(b4_GCVI), max = max(b4_G
 ## When we are leading with data wrangling we can use `pull` function to extract columns as a vector.
 ```{r}
 data |> pull(b4_GCVI) |> head(6)
-```
-
-# Across
-## `across` makes it easy to apply the same transformation to multiple columns.
-## Generally it is used into `summarise()` and `mutate()` functions.
-## In this example we are rounding to 2 decimals the double variables except latitude and longitude.
-```{r}
-data |> 
-  mutate(across(where(is.double) & !c(latitude, longitude), ~ round(.x,2))) |> head(6)
 ```
 
 # Join
